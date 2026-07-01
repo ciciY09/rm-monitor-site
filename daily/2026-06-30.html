@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>RM Community Monitor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e1e4e8;
+      min-height: 100vh;
+    }
+
+    /* 密码锁屏 */
+    #lock-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    #lock-screen .logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    #lock-screen h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #f0f0f0;
+    }
+
+    #lock-screen .subtitle {
+      color: #8b949e;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+
+    #lock-screen .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    #lock-screen input {
+      padding: 12px 16px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      background: #161b22;
+      color: #f0f0f0;
+      font-size: 16px;
+      width: 240px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #lock-screen input:focus {
+      border-color: #58a6ff;
+    }
+
+    #lock-screen button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: #238636;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #lock-screen button:hover {
+      background: #2ea043;
+    }
+
+    #lock-screen .error {
+      color: #f85149;
+      margin-top: 12px;
+      font-size: 14px;
+      display: none;
+    }
+
+    /* 报告内容区 */
+    #content {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    #content .header {
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+
+    #content .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    #content .header .meta {
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    /* Markdown 渲染样式 */
+    .markdown-body h1 { font-size: 24px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
+    .markdown-body h2 { font-size: 20px; margin: 28px 0 12px; color: #58a6ff; }
+    .markdown-body h3 { font-size: 16px; margin: 20px 0 8px; color: #d2a8ff; }
+    .markdown-body p { margin: 8px 0; line-height: 1.7; }
+    .markdown-body ul, .markdown-body ol { margin: 8px 0 8px 24px; }
+    .markdown-body li { margin: 4px 0; line-height: 1.6; }
+    .markdown-body blockquote { 
+      border-left: 3px solid #3b82f6; 
+      padding: 8px 16px; 
+      margin: 12px 0; 
+      background: #161b22;
+      border-radius: 0 6px 6px 0;
+    }
+    .markdown-body code { 
+      background: #1f2937; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-size: 13px; 
+    }
+    .markdown-body pre { 
+      background: #161b22; 
+      padding: 16px; 
+      border-radius: 8px; 
+      overflow-x: auto; 
+      margin: 12px 0;
+    }
+    .markdown-body table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin: 12px 0; 
+      font-size: 14px;
+    }
+    .markdown-body th, .markdown-body td { 
+      border: 1px solid #30363d; 
+      padding: 8px 12px; 
+      text-align: left; 
+    }
+    .markdown-body th { 
+      background: #161b22; 
+      font-weight: 600; 
+    }
+    .markdown-body tr:nth-child(even) { background: #0d1117; }
+    .markdown-body hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+    .markdown-body strong { color: #f0f0f0; }
+    .markdown-body a { color: #58a6ff; text-decoration: none; }
+    .markdown-body a:hover { text-decoration: underline; }
+
+    /* 导航 */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 17, 23, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #21262d;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .nav .brand {
+      font-weight: 600;
+      color: #58a6ff;
+    }
+
+    .nav .lock-btn {
+      padding: 6px 12px;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      background: transparent;
+      color: #8b949e;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .nav .lock-btn:hover {
+      border-color: #f85149;
+      color: #f85149;
+    }
+
+    #content.has-nav { padding-top: 80px; }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      #content { padding: 60px 16px 24px; }
+      .markdown-body table { font-size: 12px; }
+      .markdown-body th, .markdown-body td { padding: 4px 6px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 密码锁屏 -->
+  <div id="lock-screen">
+    <div class="logo">📡</div>
+    <h1>RM Community Monitor</h1>
+    <p class="subtitle">输入访问密码查看报告</p>
+    <div class="input-group">
+      <input type="password" id="pwd-input" placeholder="访问密码" autocomplete="off">
+      <button onclick="unlock()">解锁</button>
+    </div>
+    <p class="error" id="error-msg">密码错误，请重试</p>
+  </div>
+
+  <!-- 解锁后的内容 -->
+  <div id="content" class="has-nav">
+    <nav class="nav">
+      <span class="brand">📡 RM Community Monitor</span>
+      <button class="lock-btn" onclick="lockPage()">🔒 锁定</button>
+    </nav>
+    <div class="header">
+      <h1 id="report-title"></h1>
+      <p class="meta" id="report-meta"></p>
+    </div>
+    <div class="markdown-body" id="report-body"></div>
+  </div>
+
+  <!-- 加密数据（构建时注入） -->
+  <script id="encrypted-data" type="application/json">eyJzYWx0IjoicGExdi9VeHRvQkw0QWNKRHRHd2FuQT09IiwiaXYiOiJnQXJNQjkxY2wxZVI1RE9qTldkeFFBPT0iLCJjaXBoZXJ0ZXh0IjoidXRySm1QQ3RIeERmNi90QlE0Y2E3L1FUM2t1WEY3eWpZMnUrNG4xV1QzbW5saHd6bCtMRHU2UjFGSk5hZDB6RmcxTUp3bERWMnVrY1hmWnl6WTFxa2hJL2p1WHgvTUxnWlB1aVUwZTg4SGpraDRzTXl0ZjY3Qm44SnA3RlJpR2hxZHpmRjZQc2U4UnFCY2hhUUUvT0RqMmM0K2NGNUI0S0F0cy9vaXFCck9yWFZsUTcvZE1hbkRuS0NhRVU5SU50aUJTendDTXBuRExKdUlzeCs5ZjJBb1pvd0FVeWhvdHZBQXVnV0JuVmNlSVhqOTVVblhlekNzQ0RLeExETGUvNWFEbmxsNzk3VnJKTG9qekN5OEd1TFZ4YkE2VjlOcStBL0NpQ1ZUL1BSYnNjQ0VEMnFPTHBHTFZEQ1orU1FSd3dhTWhvUnpjWFNxV0QvdVUyREVqMzdQamRNZUFiWUxNMUdEVXJZUEF0bUVXMnZIc2dWS1p2eDhZNWsrajhDa3RTMHQ0QUMwTkhlejJRUzV5S2Fsdy9DbEk1dnlyTlgya2JDRS8wWndkekNvN290Ti82Qk01WmtGa29DRDkvM2RONXhTcjRnYWxZU3JjWUhJRTl5SG5XdGc2N0FTTUZUcmFwbFVndktaVXhHcVJzKzBqQzhKbDNzdituZFBEYnlGMXpKck1IdXBBUjZTZ2tTaDBNNnhPT1BiMTV4a1pCdXlGQTFtRlZuTkM1d1JhNjc1OFUzMjRuQ1dpdmpPWE5uT2dQSHZ6RFhXZjVIaEpEKzF0QW1zZ0FnVXMxVC8rMFBYeCt6NDZOZUJzQWRFdlNkNmsvbGp5dTIzWmhMTTAxSm42WGJCWlhvMlo2VHpvRUxKaWdnNjhiZnFxdUJvVUVxNGpKOFQ4RlUyK2w0ZFdtMFZQTUpWZHh2K1ZDMEx3M1FDMEhFTmJSRDd6clhyWG1kVXMrcW1sQjFuMG9wb1lXaXdFTVAwWW9PQVZzWXpKM2hCVFQ4eWQ3REM2S0d5ODZkc1pLc24vc3k4aEN0TlJCampRWFlBZ2FoS2w1LzZHK2tLQktVVFpuWUNQcE1LTFZmazdkVy9WdlZ5TWQvM3BqOURidlBpc241emNWNEZaNFVPUzZnL0xRMHJwT3dDcFlPSUJFdnhTeHZjRFo1REYwNXh3VG9WR2FXeHpOWXRLamJyWnlENEVjcHYxQVFKZ1oxcDJPZ2FYdnJpQ3ZteXozS0JRMnI4YzUyaEw5S2plNmI0RmVXSFozNXdCT2drdVhoVjBhL0JXdkc5Z3VtT05xT2NReG5oL3JqM2dGaGhja3VGb3FLZ3ZPQzJQU1I5QzlhYTU5bTlKWkhDRUxOdDd2aytOR2JXZ1VoRjlXMmpSZDY2dkRFeHdDTFVVREhGdVRPcFFPTGJxTWk1d2REaG01enprZmdkbDQyVTVGTlVWa2FCcGowNW9qdzVjSnllTWVVMkR4cUJYWlRkQnptaHkrejJmb1ZmcTFTUTM3ME9lM3IybnZuTE1NcXJZS1UyQ0V3UnhDS3FCN3RtcXBxMzJ4Q3JaTEJKMklBbVE4SWZ5UWV1T0dwVXJZeFJCWXNNQWV2WkV6VDVGRnRsdzJNUHk4cXE4bFdvNUtpU3pZWmtXYmt6Y1dPaTloYjFVdUE4Q0haRkpuby9QYUZWbHQ3ZDJqNTBkSEptV3FhTVNvZmtUekROR2RSZGRyTHpVSFc1VzJBUVVTU01TbjIxc1dGM01MTm9ycHd1V2tqUG83Zm9ULzlVUjY2OXRCQ3llaU4vWW1meGtxSjVMWld0SFNIK2xSWk1yakJCNEhLYnBtWUxBc3JGTFFDZE1pNm9JOS91c0EvU1lOZkRNYjljUjd6cG5BR1JucEtJNWxLeDBzOXNoRHNvZzFGa1F3OTZDSnpPTFZMQ3EvVmxscVhmZnhlTWZ2cHFZTFBGaDkvUHRpUDJSbS9kNW5nV1U0cWVBMVB0QnhrMDF0aEd3d2xUendhZ3JJdGxzMjJuY2pnZ3E2UEs3VVpBY0s0RENVS3JBWHhMQkZnaEFTVW5Nb21ZaC9hYlZlT3VuUFcwZVdnNnZNZ2ZhTS84cklUS28zOGtuOEV3dHE0cS9NM29XNDgxbEZ4ZFZVc1J6aEczM2xxc0U3czY2WUo1bWFxRXZsOUhVaHNaNUxUU1JmRG1HYmFFRytRMzBERUx6cmxRMWVqemhzK1UxWDhZeVFaek1Md0pGQzgrWU1ZTmRpM3VtOVl0R1lDQXNWZklKRkNES3pyY25TTkkwZVVjQkpleGV4T3phdExiVm1WVTRMV3Z2NnBObDBXcmE1NmJwLzdpYVgwQnExckpUb3FBMTVDMnkvNDMyak1PbzdFM2RZRFRhVm1KM2FjYk9DRXdVbGw5Y0I0KzdlSEZOR1JsNlZ3RG9TVEdoaG1Lc1Q3dGRGMFB6RjRiK3Y5ZktheWVZNWNtUWhWUSt2elRBa3ptMFVmU21iSjBMMDZFM1RmejdEaVJZWjJRMnZNQkZpU3J5cENEVG04OEV0RjRadG5OSUQ5R2JxemFRaHVXQjBMakxKblBHazJ5RGdLUUE1MjZPWEptU1JQT3ZtVW5TUVRHNXFFb2hZRHhLSDEyYmh3c2JnaTJkRnRvOFVJR3hyRFpLWFNHQ3J6NkgwdXJYeCs2bG9QaDhrMjZiWGZhcmU1YStwNVZ4aFhCN2lNUzJJOWxaejdqN0VHSStQUUFac2t1MVZDQ2JXemNSU2Q4RTRYSlpENmhKbEVjOGtuTzluaGtGWGNJbVNabUhHR1hKdVgxL2o5NDZYeTQ2citXVGhtTS9nRXR3Yzg5OXAzSjl0ZkFPWFA1a3VDV01NMDk1YlNNd21zZ3l0aWdrejB4b1V6eVhWV1ZRRVkyaUN2K0dCellTaUV6cGdxSkJXbHhuMk8yV1RJbVNHVkNGMFR2R0ZYNmZTUHloY0I5elpkU1JTS3Jia3FHZXZ6SFBrNXFvWTJCeWppSVU0elhyYTZDVEVhMWNnZlRmOFVwOVpESG5obnp1V0JWMjdWOGZibWYyM3E2aGM1QzlMd3grMUdLdTdQZ3NNZXltRGJrUWhXeVlnWjQ4SjVHSUpwMUpHc21jc3dSM3NQZWRhYnRwdXdmcUpYVUF5ekJnVklxeFhINzJCQ3BWZ05ST1NlWDJ5Y0lQQXdrWFg5dU96NXNNQ29QK1J2czZwN0hpcXFJOHgvQWRTaFY4WWpuRmVidHRsL0RlRlBWcUZLdzhJbzdwR01POU9tQzJUTzdQU01LU2l5RHNjL29OMU1zNlVJdGkxaHh1bHo4bHVhQktLN3BrQXVCNDRNeGNsWnFyeHYwN013d1VsNmJPck5TSUwvTDBjT25zSis1Nk5EVEJFckxvbmZBcmRVQXhnZFBsUVhleVZnd3VodlBEYnJucGRGdVh0a2VDRHdMQTRWb09TVHpuVVE5UDdzUmN6TGNrVzhIUUMvdFU2c2Y4aXFyTitwWmx3blhJeTNPSlZDN0JYZDdrb1BsRE9ibVAycDEyTUpieTQxc3hDdm95blkrUUZaeTBYeUJHZU1sZW1MOFRZVFFCcGUxUC9udDNQV1NPcXRBY2dDQVFCaTg3dnZ4c2pMcktxVWZPVXlLVFhSZXhFNEhKWnJmS2g0SW1LbitpcUJwV1hmVXZSeVRXdmswcERTRFV5OTVINmJiK3FwSkV4UHJDYU1hSUVSS1lnYkhlQjlsakhZclRDY1NqclFoSmVaMEhSMGU5VnhBWncyM1QzRlpxSmFhT2IxZTJHQWF2QkNGSGhWNCtQN2VsV0tnczdKQnYxUHZuL09xbDM1WnRNZ0NXOW1sZm04YlFwS2ZnR1hCcEMzY3c0TmlOZGIxenZWYk1oVlhnZU5qaFhmRU5KR2lSbmRPd2JsV3pyNk1QNW1VYWpmL0Rrd201b1lmczZTcXpqQWRVSzd5cDFycjlYSEJmL2xSWUJ3dHk1a3VhK0lTUHJkV1BOaVQ0TnFhUUJoeFVQNEVwM0hJTXJHNzREV0dZNk1aMWRwVGU2WUhka2VsTmVsMG9zcDA0YjU1RkhuK3VWOWszbUMrSDF6M2prODlkOGF0RDRXSjQ2K25VRHdjd2FoYW1QQVFpRkh5c1dLczNIQ2pyVUNCRStVNGQ1WnFDN0srbzFZb1Z5NG1kQW1FdEVWQjBvckNTOXFLa0MvT3QrSkU2a1dIajNOblFybUxtK1Vjd0JhOWZ6TFRuaGlLQURUelhMd2JOdmRrSVlBc21LazRBeFowakVpcDRuc3g0aThKRGlhdkVjNzZVS0xMK295Y09hcjNtWnlMaERCR2gzaTR1RHZBbG14OFEwUnVxbmRmWmFWb0gzMzNXRGJNeGhXV0hsU1NNTXJVOU5hVXFwUzIxNW1SQ2FyeS9XMFlYN3p5Y3pRNmNQVVpQeU1yUjZoa0RuS0dqbk50by95U3lNL0Zya083eDFSRVhKZytTbWpYeXgzcWJTaFRlQVY2TTltejZ5QTcwK1Q0T0l6UkEvZWRCNXBoUVh5WmRsMUtob01TdXltK1cvZ3JOY1hGS29RNk9MYUtUSTFnMEFQL1d5Q3hXcnFYdlJMbVRuaTBXeGZTN1hrVlRsMHdBdlY1MThGWERnTW9mNW9HOG45MjR6M2pVblYvbDJIK0tWZlNrYW5GVk8xaHdPd3U0Z1Q0dHBoRENaSzNjaHhLY0ppcmpJNmx5dFNyT29GaTlCWnpiUDZ4aXAzb0ZpZ1l1UDhjdStHM2xHQnpWOU9xK3pTYVpteWZQcUZMM3oyY0FmSExVeU5GR1ZhU1NVUGlzRXpudWhhdk90REZpV1dNUElKM0tRWlhtSjEwazRKRHd3Z25kVTE5eVVxMXY1VUtPcjN5d0dwNHdnN3IySzlKWCsyekZ0M3Z0RE1iOWM4ZzE4cEwrWVF1NGI1b1NPSHltQTJDN2hWLzJBMFMzaHhqWWFiYjBhdld6S2FZcC9SUFNTdFZldnVkOTNGZXhEWU5vZmJZbHhvYXI5U2dzK3lRWkFDOU1lOUhBV3lhRC9xa2Jqd0x1b05NalR0TG1nMFNERkFSbFd4TmZHcktwcTZxMDVjck1iRFBDV1cvUU0yM2pKSklHdVV0NHlmRnhubE1reXFMVVFISU9PU1N2UFlvNldNL0VJNUpaczEzTnU3REtXZ0tweGs2TXRzdUg0ckhod2xDV0RtckJlT0g1bWYvUzE5VjI1Z1JjWEZocnZXTHpEdmc3M1ovOTZBdDBaSXI2T0dpancyYnA5NG9XUXBzcmVmbnM0ZisydjROZkd0U3l4R1hSZ2I2YUhrazFTUWdLdHNVcW5wdWtLN05SNDNHNWVYUjJnakRKMWdnL1dxNnRKRUlpajA3V1E3ZzF2b0R5QWx4RXd0czBVMWlOZ1JzT3BnZ2YrL2ZUeGZMT1Z2bmVHcU5GVkxMZjFPQkFINjU0K3BjWllXUDZDV0psMEYzS21FeEluUDBsQkxFZDJhRFp1VmVIOVpLQkpNb0pHdDRnL0sxMFN3TWlBUzBQNXFDVlVIREN6MXY1S3pTaFBzL1Z5aTBVME1GMm5TQzhXZ2E2dEZZbkNQNjJjNXV0UFI5NTJWMnNFNURQOWlwY0J5N3ErY1FZcGhNL2NmZEtqR2tXdEZTUXRwbHZ0bjRoVXpFeW9NQmRIejNoRFl5YlZNSnI3ZjJpVWVseDN3RVJLRjEwemY5MGlCNVFlNzNuU0dScFVlR1E0a1lCcjRNMHBtMVFKSGlndVdmeXRxbWFxK0JGcnZNa2J2ZHNIcGlNZFkrQlB1NXB4Tnp2NTVGWllackVkbHJ6Yi9CNis1Wlk3QVg5enZBcFpZM3RvaS9oNkdOR0wxZlZPWSs2RHlocnlmYXVONGFlSmMvbXNWcnJTOUxFNjJEYVd1MU5QempyeEtoVVJOTGhGMVdOWGM4NTA0MUZXdWNmT0xkenVKRFZLeTJJRUxyKzdvN2piM2Q3Zk10d0EzazVQK3YwNWNpakJMcEhnS2MvMjEzOFdNak1VYmpjY0puTHFDTVZNeC8vVjc0NWRhUURldmlFcmZMaUsvZXM0NkhDQXNwdzhBeFF4OWtWNFRnVzh0ZmVDMVJaV1JZOEtXNDRPeTZzWWRaM3p3OEZLYW9hc2hrNUlmSWVzaHJtSHhtNHF5Um9rT0M1RHU5OGV6KytJbTZHVGFKbU84aU43eEIwSkFlbDl4WldSdmdwaFVDT1hDUitxS3k3NnFLK0dBV09KRGpQU0dtR3ZvSlhmZkFzS3Z4VHlEY0J0WHh1eVhrWXpmYWJNSU1zUHlnY0VsWlZqUk1tN2ZFZjh3TVJZUCtvK0lWR1B5QmxzTi94TlhBc1BmYlhhUkIxdkdscGxvRVplRWQrQXpTUkdOdysxYngyYno5QlRlS1Q0UVFwT0RuVkhkTTNGUCtuOEdSM3JhK2JFZFpGY2lNelphWkpJRFpkTHgzZW1HOXkzMEZiU3dYMHUxYjdFWWdlMFM3NlptUVVpMDRhU1dJdkJJWHJRRzNKaU5Ic3NUUGpjd3g4UjAzQXJ5NEVOYWtNQzlPQVFOSDZUcjJrYmlNalRabm01ZUh0VnA0Vm1STUtrSUhOQkpzNURrU0JEWkJhK0RSOGtPTmlMK0FjZE53WnFoeElXZVRZdllTdSs1R091Z1V3ZmZOZW5mV0dXQ1diQ1NGR2pNOHBxYjlCbkJGSW9zVzgrWWY4ckMxb2JQeFZWampGcVhhSlRMalZNSjBBTHgxTlpHVWVrNDZFWXJDVDg4RDhJY0JHejZHZEpsdkEvc3RJWnhFQUQwMHpUWUF5SERIc1VpZkxaZERrS1FGWW1pdnRHWDd5OXBVMkN5OUJvYmpLRkhaZ2w1cDFrbWhrNmJjeGlxdTVLdkJZOGM5VFJqZGRyemR3TXNkUWlBaTBmQ01aNUdWeG55VGJBbFBISkpIQ3JESnlpbEtyZ0hMRXU1bnZveldrbWtrUDhLVzcrNzdYUDFoMWN0S01uVW9oU0lRSm5PQjdjc1k3cklDTUk0NmpEVmhjQ1B2eHZoaTBoMEZuZEJGaW02a3NVTXJEa2ZydloyeUhhc3BWeDRYV09pRytjdW5nL2lNckRqMURKYkl4OEtncjY4M0ovZUYyVWl3aVM1ZkQ0Y0IvNkxTenVTNTlJVGxxKzFJNHUwVVBXYjB0S3B2aWlPZWFNb3hPVzNKVE1ITnQyS09BQzZRVXBjNi9MZmtOSlFmc25ES0JRd1BqbmhnQkpaZkI2Q1ROOXpMUHpFMzBobjg0UWJycEhQVWtLNDNzSkNuTDN3b2pjbFJUa1RINFJ4dTI3dFNxSWhnZFVuTEF4a3pFaThKUTVTU0dOKzFBZkhrSlVOSFFGVnMyQ1NDY1p1c2JmTGNUQ2RIN25iN3VuSnYxRlA5SVVVNzV4NmJ6Z1V6Q3U0OWpDTEszVDlTTnZEYmRGaGM5US9yM3crVm01bHI1eUVsY3UzeXNrcmZYZGhWUkdncGJKVlloWnVYcUtOYnhDdlZraGlPN285a0pCWVRLbTc3VVBnUUoxWGNZUnRDRDZsazFyQVdCVk1NQ3RqU0NoU3IvTWxscjdSVVNqTWlKN1JmWHB5a2UrK3NMaEsxYnR2Z0ZscEZwWUJQZlJMTlNEdWJEQ0JPeDhWdmtBNktKMGtXd1Q4V3RtUnJxSmZFWlJnN1NuWURRR3FEaHJFRHZBdm9leDlJTDNkZUVQbTJQeEY1eFlaUTIybWRRYlJlMldqREVnU2toQ1BmQzlHY2ZaNHVsaDVCWi95ZlAyanUrZnhubFBNTjZRNVhJazR1YktxQUNjRER5QjQ0U1B5WkVmVFdINWNnMkxGalNSTU5KOWh5T0dLOEJkOGdaVll5aFZLWlIralJvUkNKNDlkaklEdk8zd0hybk1VWVlkWGthQ1A2ZDlCeTI1RkxPMlduMHR6Qkhzei9odlEwaVRTNGgzMTF6R0hMdEVmL013WlRNSm9YcFNIakpoUmJEM2N6bHozemU2eGZkR1hyeHkvRkdQRExrU0RrRU5OVktncUYxRTViaTA4WWdTQnJhMXJ6Z2xIcWMwTTFzUTVrL3grTXN3Z0d1SDBqa1RqWk91U05uSVlCUkNFVU8vbDFJbGJ2TCtSSWZwUGxkRGY3eVR1Z1QrUnV1dy9kN0NDWU13M2xSL0ZGTU13WjFDTXoxb2ZBaUJ6RWdWaVgvMkxicm1KRHpTejdhQkpJTUV1Z1Y3NlJyaE84ZE02N1pIUTBUZnI0OUVzU0dsS24vb3h6Z1dyOU9lNWhNMm1MaFVQUUdKME9DVzYzZ1VjcWxoemFVdjB6cDl3L0xhT2o3QjFFUXBzU3poWTZyb1lQeWZWYytWRTJBOXB3WEdxVUdhTElROEVRSG1XK0h6QlpudHo5eCtmanY0MW5aT09admRERjAvODZNdk16em51MG00V2VNQk5ROTYyZVJ0VzNJaU02cmRCam5XRGJtTFdnMjZWczBLWTFrNnZXcmoxSklpajQxcCttNTBMVStXSEpxeTJJS3A2WTR6SjQzenAyWXpmanBOaEZJWkg2SFNYb3NOVWNmZ3JKa2NTdUhCVkprTnk4RXpnTldIZFFqdlhxSXo1eGZhWnQrRy9YWHRYVnJWSFlYWGtsclcva1k4L0xpSDZjQ0tMeTlMQmMrWE1YK0NWUHZWOHdUMzBJVzIxbWFPOC9WZHZ1ay9FN1dFdUtDV0FOcnhDL1gwbDB6QzhMNlFDcTV1b0NCRnhSL3h2b21FZ1A1V0RjZHRkK0VOamErcDBmNFNzTHFzMS9pVU5nTG83U01saE8vZ2dtOWxYdWVJZG5PNCswRHcvZTNOT2EwdmJPblEyQmpYRHZUL211RC9SS2RrQ2p3SHJkRXZPSGttdlh0YW1mOFA1SmZHMFQ1RkZtZG5mMGxUL2QyeHlvS2RiaHExcWpyMGlFL1JEK1F3MmU5b0doZy84OTBBbFEwbDhkZGM5MUJ5NGRUeVNxQUs0cXR6NFNONVdyd3ZEVmV3YUtUQWE3UEpwN0NVV3liM3hJdWFhZUE0UEFQVjJnV2FzelBMdWlzdXg2ZFB1eDhtdWZHU3QyZndVRi9YR1VpYWpmSVpWemRsaWJiSUEvcS9ROUFScm9oYVdKemc2K2hxQ2lGN1VUOHM1VTcxRDZqL296cklYMGNJNXdPZmdwWG5tOVJ1VVF2QU9JeGc3SVR1SjhBdlBtZk5IbVJNdTNUNUpGV29yMWRNMEtWTGtUVHlPYUE2MTVQYXJNYjBCcy9QcXlManhrV1hSN3phS084UEpUUFJ4TlBOQ3hpR1d2Q1VzKzhGRTdoWFBLRjlnS1RqSmhtWERCVzUwQktwL0hRVzlydHkwcW5NZjRYd0tVSzNobU1iVHQ2dWdBVklaa3RHNnJlcVhMdEpLak02ekkzdEx1S05lZ1JRNUVvYzVhMnc4WmMvTFZnZzZhOFdSRHdtWllySnVOcEY2aS9Jc1RERlBrRERSYWZXbjRkZ01OUE9vWERWVEpOWS9saGZaRWczdVNTNXhkMGJ3VzZWSHBsRXFsTFJQMDlqNGlFRTVYUmxjYUk4NitYczhzMjYvdGRHN2RaU3M4VVZGU2FEclNSR3BkR3FsdFk2TjFqdXZoU3FGbTZ5enhyeEhTdmVFUG13OGRjM0FqRzVFaDV5RUM0NzBaMVB4L3dMSDdzV1BOc0lzNUtkMitEbUtRd3dNR0NVcUEySGZGSzcxWC9tNHd3MDBDd0RTTUVONy8wd2JnaTFZZ3JlK0pocWM3bEVkeFJ6UWx5SEhIZjF1eXVaaHA2c1hFMlpxa0VJSTBsbUVZOExKT2hKdjFXZ1hkN2ZZd01YMjM3VHNKcE1KOVlLVnhFREVMRlljOFlKRElwN21kUGhsM1JEVmhCRGN1Sm52N1pVMDdHLzE2R3I2cjhXU0QyVXR3dVFaeFUwMXNyMUFaWC9rRDBXY0k5Rkp1dEk0K3lCVkdRdUZTclJKcXp0bFRLeEtsWEFZVk93OXNPeWZ1ODV1R2g5ejFSY2FWZVZ4YmpvSTFIbTF3amdlRVRmdmxkOU8wL05hdzVvaUc4WXNQYUVCSTJHa0VNdUFIeHl2b3Z6bGwvUWRTQ3czVFpMQnV0dXM0cFpnd0dtL0xjQWFsQy9vaWlEZTg4ejFNQVdTdktqQk91UDh3S092djdDb2FGdVhZK3NwY2JXcElJZ01KYzRBdCtYN2EzKzg0THIxMVFudzF1SE1obXVORlBBc0t6Mmc0V3kvSU9mRklJVGo5WjN2T095TjRaTGRJUjlmNkRxNkx1Qk1oYXEwSEZIWWV5YXlUUG5tZUMwelZkT2l4eUhKdEtKVEFWNkFuQkZRdW92WjJMNk9iVFBqN2xjOVFvQTNIQ2hLejdvUDRrQWZudG9jUUNaQW5BdUcwaWZ6WlBBdGJidnQ0cFhmV29hS2luWkI0V1ZISEpOZ0M4YkFkYnZoNWtRSUZYV201VVF1MnU2SUo3QUQwU0hTSHExZ3JBTnhUN3dka3duU3lvK0J4MG44Z3I0b3ByRG9kV2dmcXZML2JSRk0zLzdjdlUrZ05DcFpraVJhUXprR0VWNWFXbVZWV3N2MWNMN1daV0tCN0RudkFEZzZGOHhmUlJ6QVl2M213SHZNZ1VtVGtpd3dsNWJkcXF6YWgwVjdNM0ZnNnBpZytEKzZXbFB5djNZcEQ0NUw3MFAyUUM5L2pzS21xNkEvaTc2dlBDRjR5Rkl0dHNleFdlZVN4MEJodGoyRmtjdkZQNHVIalBxU2M5dUxKTE1YdGErdmpsRHZTZFFMMFpaV2xXWUlLRT0ifQ==</script>
+
+  <script>
+    // AES-256-CBC 解密（使用 Web Crypto API）
+    async function decrypt(encryptedBase64, password) {
+      const encData = JSON.parse(atob(encryptedBase64));
+      const salt = Uint8Array.from(atob(encData.salt), c => c.charCodeAt(0));
+      const iv = Uint8Array.from(atob(encData.iv), c => c.charCodeAt(0));
+      const ciphertext = Uint8Array.from(atob(encData.ciphertext), c => c.charCodeAt(0));
+
+      // 从密码派生密钥 (PBKDF2)
+      const encoder = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']
+      );
+      const key = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-CBC', length: 256 },
+        false,
+        ['decrypt']
+      );
+
+      try {
+        const decrypted = await crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, ciphertext);
+        return new TextDecoder().decode(decrypted);
+      } catch {
+        return null;
+      }
+    }
+
+    // 简易 Markdown → HTML（无依赖）
+    function renderMarkdown(md) {
+      let html = md
+        // 表格
+        .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((\|.+\|\s*\n)*)/gm, (match, header, body) => {
+          const headers = header.split('|').map(h => h.trim()).filter(Boolean);
+          const rows = body.trim().split('\n').map(row => 
+            row.split('|').map(c => c.trim()).filter(Boolean)
+          );
+          let table = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+          rows.forEach(row => {
+            table += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>';
+          });
+          return table + '</tbody></table>\n';
+        })
+        // Headers
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        // HR
+        .replace(/^---+$/gm, '<hr>')
+        .replace(/^━+$/gm, '<hr>')
+        // Blockquote
+        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+        // Bold
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        // Code
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        // Links
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+        // Lists
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        // Paragraphs
+        .replace(/\n\n/g, '</p><p>')
+        // Line breaks
+        .replace(/\n/g, '<br>');
+      
+      // Wrap lists
+      html = html.replace(/(<li>.+<\/li>(<br>)?)+/g, (match) => '<ul>' + match.replace(/<br>/g, '') + '</ul>');
+      
+      return '<p>' + html + '</p>';
+    }
+
+    async function unlock() {
+      const pwd = document.getElementById('pwd-input').value;
+      if (!pwd) return;
+
+      const encData = document.getElementById('encrypted-data').textContent.trim();
+      const decrypted = await decrypt(encData, pwd);
+
+      if (!decrypted) {
+        document.getElementById('error-msg').style.display = 'block';
+        document.getElementById('pwd-input').value = '';
+        document.getElementById('pwd-input').focus();
+        return;
+      }
+
+      // 解析内容
+      const data = JSON.parse(decrypted);
+      document.getElementById('report-title').textContent = data.title;
+      document.getElementById('report-meta').textContent = data.meta;
+      document.getElementById('report-body').innerHTML = renderMarkdown(data.body);
+
+      // 切换视图
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+
+      // 记住密码（sessionStorage，关标签页自动清除）
+      sessionStorage.setItem('rm-pwd', pwd);
+    }
+
+    function lockPage() {
+      sessionStorage.removeItem('rm-pwd');
+      document.getElementById('content').style.display = 'none';
+      document.getElementById('lock-screen').style.display = 'flex';
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('error-msg').style.display = 'none';
+    }
+
+    // 回车键解锁
+    document.getElementById('pwd-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') unlock();
+    });
+
+    // 页面加载时检查 sessionStorage
+    window.addEventListener('DOMContentLoaded', async () => {
+      const savedPwd = sessionStorage.getItem('rm-pwd');
+      if (savedPwd) {
+        document.getElementById('pwd-input').value = savedPwd;
+        await unlock();
+      }
+    });
+  </script>
+</body>
+</html>
