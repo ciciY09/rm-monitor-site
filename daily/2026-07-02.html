@@ -10,53 +10,286 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e4e8; min-height: 100vh; }
     .nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(15,17,23,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #21262d; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
     .nav .brand { font-weight: 600; color: #58a6ff; text-decoration: none; }
+    .nav .nav-right { display: flex; align-items: center; gap: 12px; }
     .nav .back { color: #8b949e; text-decoration: none; font-size: 13px; }
     .nav .back:hover { color: #58a6ff; }
+    .nav .edit-btn { padding: 6px 14px; border: 1px solid #30363d; border-radius: 6px; background: transparent; color: #8b949e; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+    .nav .edit-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+    .nav .edit-btn.active { border-color: #3fb950; color: #3fb950; background: #3fb95015; }
     .container { max-width: 900px; margin: 0 auto; padding: 80px 24px 40px; }
-    .header { border-bottom: 1px solid #21262d; padding-bottom: 24px; margin-bottom: 32px; }
-    .header h1 { font-size: 28px; margin-bottom: 8px; }
-    .header .meta { color: #8b949e; font-size: 14px; }
-    .md h1 { font-size: 24px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
-    .md h2 { font-size: 20px; margin: 28px 0 12px; color: #58a6ff; }
-    .md h3 { font-size: 16px; margin: 20px 0 8px; color: #d2a8ff; }
-    .md p { margin: 8px 0; line-height: 1.7; }
+    .header { margin-bottom: 28px; }
+    .header h1 { font-size: 26px; margin-bottom: 6px; }
+    .header .meta { color: #8b949e; font-size: 13px; }
+
+    .summary-box { background: linear-gradient(135deg, #161b22 0%, #1c2333 100%); border: 1px solid #30363d; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; line-height: 1.8; font-size: 15px; color: #c9d1d9; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px; text-align: center; }
+    .stat-card .number { font-size: 26px; font-weight: 700; color: #f0f0f0; margin-bottom: 4px; }
+    .stat-card .label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+    .core-topic { background: #1f6feb22; border: 1px solid #1f6feb55; border-radius: 8px; padding: 12px 16px; margin-bottom: 28px; font-size: 14px; color: #79c0ff; }
+    .core-topic strong { color: #58a6ff; }
+
+    .section-title { font-size: 17px; font-weight: 600; color: #f0f0f0; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .sent-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
+    .sent-seg { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; min-width: 36px; }
+    .sent-pos { background: #238636; }
+    .sent-neu { background: #1f6feb; }
+    .sent-neg { background: #da3633; }
+    .sent-labels { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; font-size: 13px; color: #8b949e; }
+    .sent-label { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .trend-chart { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px; margin-bottom: 28px; text-align: center; }
+
+    .topic-row { display: flex; align-items: stretch; margin-bottom: 10px; border-radius: 10px; overflow: hidden; background: #161b22; border: 1px solid #30363d; }
+    .topic-left { width: 90px; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 8px; border-left: 4px solid; }
+    .topic-sentiment { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .topic-pct { font-size: 22px; font-weight: 700; color: #f0f0f0; }
+    .topic-right { flex: 1; padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; }
+    .topic-title { font-size: 15px; font-weight: 600; color: #e1e4e8; margin-bottom: 6px; }
+    .topic-desc { font-size: 13px; color: #8b949e; line-height: 1.5; }
+
+    .divider { border: none; border-top: 1px solid #21262d; margin: 32px 0; }
+    .full-report-toggle { display: block; width: 100%; padding: 14px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; color: #58a6ff; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; margin-bottom: 24px; transition: background 0.15s; }
+    .full-report-toggle:hover { background: #1c2333; }
+    .full-report-content { display: none; }
+    .full-report-content.show { display: block; }
+
+    /* 编辑模式 */
+    [data-editable="true"].editing { outline: 2px solid #58a6ff44; outline-offset: 2px; border-radius: 4px; background: #161b2288; min-height: 1.5em; }
+    .edit-toolbar { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1c2333; border: 1px solid #30363d; border-radius: 10px; padding: 12px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 200; gap: 12px; align-items: center; }
+    .edit-toolbar.show { display: flex; }
+    .edit-toolbar .tb-btn { padding: 8px 16px; border: 1px solid #30363d; border-radius: 6px; background: transparent; color: #c9d1d9; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+    .edit-toolbar .tb-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+    .edit-toolbar .tb-btn.save { border-color: #3fb950; color: #3fb950; }
+    .edit-toolbar .tb-btn.save:hover { background: #3fb95022; }
+    .edit-toolbar .tb-info { font-size: 12px; color: #8b949e; }
+
+    .md h1 { font-size: 22px; margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
+    .md h2 { font-size: 18px; margin: 24px 0 10px; color: #58a6ff; }
+    .md h3 { font-size: 15px; margin: 18px 0 8px; color: #d2a8ff; }
+    .md p { margin: 8px 0; line-height: 1.7; font-size: 14px; }
     .md ul, .md ol { margin: 8px 0 8px 24px; }
-    .md li { margin: 4px 0; line-height: 1.6; }
-    .md blockquote { border-left: 3px solid #3b82f6; padding: 8px 16px; margin: 12px 0; background: #161b22; border-radius: 0 6px 6px 0; }
-    .md code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-    .md table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
-    .md th, .md td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+    .md li { margin: 4px 0; line-height: 1.6; font-size: 14px; }
+    .md blockquote { border-left: 3px solid #3b82f6; padding: 8px 16px; margin: 12px 0; background: #161b22; border-radius: 0 6px 6px 0; font-size: 13px; }
+    .md code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    .md table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    .md th, .md td { border: 1px solid #30363d; padding: 6px 10px; text-align: left; }
     .md th { background: #161b22; font-weight: 600; }
     .md tr:nth-child(even) { background: #0d1117; }
-    .md hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+    .md hr { border: none; border-top: 1px solid #21262d; margin: 20px 0; }
     .md strong { color: #f0f0f0; }
     .md a { color: #58a6ff; text-decoration: none; }
-    .md a:hover { text-decoration: underline; }
-    @media (max-width: 768px) { .container { padding: 60px 16px 24px; } .md table { font-size: 12px; } .md th, .md td { padding: 4px 6px; } }
+
+    @media (max-width: 768px) {
+      .container { padding: 60px 16px 24px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .topic-left { width: 72px; min-width: 72px; }
+      .topic-pct { font-size: 18px; }
+      .edit-toolbar { left: 16px; right: 16px; transform: none; }
+    }
   </style>
 </head>
 <body>
   <nav class="nav">
     <a href="/" class="brand">📡 RM Community Monitor</a>
-    <a href="/" class="back">← 返回首页</a>
+    <div class="nav-right">
+      <a href="/" class="back">← 返回首页</a>
+      <button class="edit-btn" onclick="toggleEdit()">✏️ 编辑</button>
+    </div>
   </nav>
+
   <div class="container">
     <div class="header">
-      <h1 id="title"></h1>
-      <p class="meta" id="meta"></p>
+      <h1 data-editable="true">RM社群日报 — 2026-07-02</h1>
+      <p class="meta">报告类型：日报 | 日期：2026-07-02</p>
     </div>
-    <div class="md" id="body"></div>
+
+    <div class="summary-box" data-editable="true">距7月9日港澳区域公测仅剩7天，Discord社区热度持续高位运行，单日消息量达1495条（环比+2%），活跃用户156人（+15.6%）。核心话题仍围绕"7月9日测试倒计时"和"下载方式/设备选购"。阿拉伯语社区贡献超60%消息量，出现大量设备选购讨论和测试前准备话题。西班牙语社区活跃度大幅回升。社区整体情绪偏正向，期待感持续升温。官方外部社媒继续静默。</div>
+
+    
+    <div class="stats-grid">
+      <div class="stat-card"><div class="number">1495</div><div class="label">总消息数</div></div>
+      <div class="stat-card"><div class="number">12</div><div class="label">活跃频道</div></div>
+      <div class="stat-card"><div class="number">156</div><div class="label">活跃用户</div></div>
+    </div>
+
+    <div class="core-topic"><strong>🎯 核心话题：</strong><span data-editable="true">7月9日港澳区域测试倒计时（7天），玩家讨论设备选购、下载方式、区域限制</span></div>
+
+    <div class="section-title">📊 玩家情感趋势</div>
+    
+    <div class="sent-bar">
+      <div class="sent-seg sent-pos" style="width:72%">72%</div>
+      <div class="sent-seg sent-neu" style="width:25%">25%</div>
+      <div class="sent-seg sent-neg" style="width:3%">3%</div>
+    </div>
+    <div class="sent-labels">
+      <span class="sent-label"><span class="dot" style="background:#3fb950"></span>正面 — <span data-editable="true">7/9测试高期待、积极设备准备、社区互助氛围好</span></span>
+      <span class="sent-label"><span class="dot" style="background:#f85149"></span>负面 — <span data-editable="true">极少数对iOS不支持的遗憾</span></span>
+    </div>
+    <div class="trend-chart"><svg viewBox="0 0 560 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:560px;height:auto;">
+    <text x="32" y="134" text-anchor="end" fill="#484f58" font-size="10">0%</text><line x1="40" y1="130" x2="540" y2="130" stroke="#21262d" stroke-width="0.5"/><text x="32" y="106.5" text-anchor="end" fill="#484f58" font-size="10">25%</text><line x1="40" y1="102.5" x2="540" y2="102.5" stroke="#21262d" stroke-width="0.5"/><text x="32" y="79" text-anchor="end" fill="#484f58" font-size="10">50%</text><line x1="40" y1="75" x2="540" y2="75" stroke="#21262d" stroke-width="0.5"/><text x="32" y="51.5" text-anchor="end" fill="#484f58" font-size="10">75%</text><line x1="40" y1="47.5" x2="540" y2="47.5" stroke="#21262d" stroke-width="0.5"/><text x="32" y="24" text-anchor="end" fill="#484f58" font-size="10">100%</text><line x1="40" y1="20" x2="540" y2="20" stroke="#21262d" stroke-width="0.5"/><text x="40" y="155" text-anchor="middle" fill="#8b949e" font-size="10">06-26</text><text x="123.33333333333333" y="155" text-anchor="middle" fill="#8b949e" font-size="10">06-27</text><text x="206.66666666666666" y="155" text-anchor="middle" fill="#8b949e" font-size="10">06-28</text><text x="290" y="155" text-anchor="middle" fill="#8b949e" font-size="10">06-29</text><text x="373.3333333333333" y="155" text-anchor="middle" fill="#8b949e" font-size="10">06-30</text><text x="456.66666666666663" y="155" text-anchor="middle" fill="#8b949e" font-size="10">07-01</text><text x="540" y="155" text-anchor="middle" fill="#8b949e" font-size="10">07-02</text>
+    <polyline points="40,80.5 123.33333333333333,77.2 206.66666666666666,75 290,72.8 373.3333333333333,69.5 456.66666666666663,66.2 540,64" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="40" cy="80.5" r="3.5" fill="#3fb950"/><circle cx="123.33333333333333" cy="77.2" r="3.5" fill="#3fb950"/><circle cx="206.66666666666666" cy="75" r="3.5" fill="#3fb950"/><circle cx="290" cy="72.8" r="3.5" fill="#3fb950"/><circle cx="373.3333333333333" cy="69.5" r="3.5" fill="#3fb950"/><circle cx="456.66666666666663" cy="66.2" r="3.5" fill="#3fb950"/><circle cx="540" cy="64" r="3.5" fill="#3fb950"/><polyline points="40,86 123.33333333333333,88.2 206.66666666666666,91.5 290,90.4 373.3333333333333,93.69999999999999 456.66666666666663,94.8 540,97" fill="none" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="40" cy="86" r="3.5" fill="#58a6ff"/><circle cx="123.33333333333333" cy="88.2" r="3.5" fill="#58a6ff"/><circle cx="206.66666666666666" cy="91.5" r="3.5" fill="#58a6ff"/><circle cx="290" cy="90.4" r="3.5" fill="#58a6ff"/><circle cx="373.3333333333333" cy="93.69999999999999" r="3.5" fill="#58a6ff"/><circle cx="456.66666666666663" cy="94.8" r="3.5" fill="#58a6ff"/><circle cx="540" cy="97" r="3.5" fill="#58a6ff"/><polyline points="40,113.5 123.33333333333333,114.6 206.66666666666666,113.5 290,116.8 373.3333333333333,116.8 456.66666666666663,119 540,119" fill="none" stroke="#f85149" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="40" cy="113.5" r="3.5" fill="#f85149"/><circle cx="123.33333333333333" cy="114.6" r="3.5" fill="#f85149"/><circle cx="206.66666666666666" cy="113.5" r="3.5" fill="#f85149"/><circle cx="290" cy="116.8" r="3.5" fill="#f85149"/><circle cx="373.3333333333333" cy="116.8" r="3.5" fill="#f85149"/><circle cx="456.66666666666663" cy="119" r="3.5" fill="#f85149"/><circle cx="540" cy="119" r="3.5" fill="#f85149"/>
+    <rect x="410" y="4" width="125" height="50" rx="4" fill="#0f1117" opacity="0.85"/>
+    <circle cx="422" cy="16" r="4" fill="#3fb950"/><text x="430" y="20" fill="#c9d1d9" font-size="10">正面</text>
+    <circle cx="422" cy="30" r="4" fill="#58a6ff"/><text x="430" y="34" fill="#c9d1d9" font-size="10">中性</text>
+    <circle cx="422" cy="44" r="4" fill="#f85149"/><text x="430" y="48" fill="#c9d1d9" font-size="10">负面</text>
+  </svg></div>
+
+    <div class="section-title">🩺 玩家核心议题</div>
+    
+      <div class="topic-row">
+        <div class="topic-left" style="border-color: #3fb950; background: #3fb95018;">
+          <div class="topic-sentiment" style="color: #3fb950;">正面</div>
+          <div class="topic-pct">30%</div>
+        </div>
+        <div class="topic-right">
+          <div class="topic-title" data-editable="true">7/9区域测试倒计时与期待</div>
+          <div class="topic-desc" data-editable="true">各语言社区统一的倒计时期待情绪，玩家分享兴奋</div>
+        </div>
+      </div>
+
+      <div class="topic-row">
+        <div class="topic-left" style="border-color: #3fb950; background: #3fb95018;">
+          <div class="topic-sentiment" style="color: #3fb950;">正面</div>
+          <div class="topic-pct">15%</div>
+        </div>
+        <div class="topic-right">
+          <div class="topic-title" data-editable="true">社区闲聊/文化交流</div>
+          <div class="topic-desc" data-editable="true">社区氛围轻松活跃，跨文化互动增加归属感</div>
+        </div>
+      </div>
+
+      <div class="topic-row">
+        <div class="topic-left" style="border-color: #58a6ff; background: #58a6ff18;">
+          <div class="topic-sentiment" style="color: #58a6ff;">中性</div>
+          <div class="topic-pct">25%</div>
+        </div>
+        <div class="topic-right">
+          <div class="topic-title" data-editable="true">设备选购与配置讨论</div>
+          <div class="topic-desc" data-editable="true">大量阿拉伯语玩家讨论iPad/Android平板选购，准备迎接测试</div>
+        </div>
+      </div>
+
+      <div class="topic-row">
+        <div class="topic-left" style="border-color: #58a6ff; background: #58a6ff18;">
+          <div class="topic-sentiment" style="color: #58a6ff;">中性</div>
+          <div class="topic-pct">20%</div>
+        </div>
+        <div class="topic-right">
+          <div class="topic-title" data-editable="true">下载方式/Play Store区域</div>
+          <div class="topic-desc" data-editable="true">各语言新成员重复询问，MOD积极引导等待7/9官方信息</div>
+        </div>
+      </div>
+
+      <div class="topic-row">
+        <div class="topic-left" style="border-color: #58a6ff; background: #58a6ff18;">
+          <div class="topic-sentiment" style="color: #58a6ff;">中性</div>
+          <div class="topic-pct">10%</div>
+        </div>
+        <div class="topic-right">
+          <div class="topic-title" data-editable="true">VPN/IP限制疑问</div>
+          <div class="topic-desc" data-editable="true">非港澳玩家关注安装是否需要VPN，MOD回应信息尚未确定</div>
+        </div>
+      </div>
+
+    <hr class="divider">
+    <button class="full-report-toggle" onclick="toggleReport()">📄 展开完整报告</button>
+    <div class="full-report-content md" id="full-report"></div>
   </div>
-  <script id="report-data" type="application/json">{"title":"RM社群日报 — 2026-07-02","meta":"报告类型：日报 | 日期：2026-07-02","body":"好的，Yvonne。这是根据您提供的 Discord 采集日志生成的 RM 社群日报。\n\n```\n# RM社群日报 — 2026-07-02\n\n> 📡 By Yvonne | RM海外社群经理\n> 监控时段：2026-07-01 00:00 ~ 2026-07-02 23:59 (UTC)\n> 数据来源：Discord Bot 一手采集\n\n---\n\n## 一、今日热门内容TOP3\n\n| # | 内容 | 来源 | 数据/备注 |\n|---|------|------|-----------| \n| 1 | **7月9日香港澳门区域测试** | Discord | 社区核心话题，由1_cc、savage.xia0等多位成员反复提及，引发全球玩家对下载方式、是否需要VPN的广泛讨论。 |\n| 2 | **设备推荐与讨论** | Discord | 阿拉伯语频道热烈讨论RedMagic、iPad Pro等设备性能，为迎接测试做准备，话题热度高。 |\n| 3 | **请求新增巴西/葡萄牙语频道** | Discord | 巴西玩家marleyzin在#general频道多次请求，社区经理savage.xia0回应已提交建议，引发小范围讨论。 |\n\n## 二、口碑舆情摘要\n\n### ✅ 正面\n- **测试期待值高**：玩家对7月9日的区域测试充满期待，情绪积极。多位玩家（如makar45376627）确认全球可玩后表示兴奋。\n- **社区互助氛围良好**：资深成员如1_cc、savage.xia0、sg8f等积极回答新玩家关于下载、VPN、设备配置等问题，社区氛围友好。\n- **Creator Space活跃**：新Creator加入，社群经理1_cc和harperere表示欢迎，俄罗斯Creator讨论测试申请流程，社群生态健康。\n\n### ⚠️ 需关注 L2\n- **巴西/葡萄牙语社群需求**：巴西玩家marleyzin多次请求创建巴西频道，虽已引导至建议频道，但该需求未被满足前可能引发小范围不满。\n- **iOS玩家被排除在外**：区域测试仅限Android，部分iOS玩家（如yusufdmr75062）表达失望，需关注后续iOS测试计划公告。\n\n### 🚨 紧急舆情 L1+\n- 今日暂无\n\n---\n\n## 三、Discord 社区舆情\n\n> ✅ 数据来源：Discord Bot 一手采集\n> 监控时段：2026-07-01 00:00 ~ 2026-07-02 23:59 (UTC)\n\n🌍 社区概览：\n- 总消息数：1495 条（玩家 1460 条 / Creator 35 条）\n- 活跃频道数：12 个\n- 活跃用户数：156 人\n- 核心话题：围绕7月9日区域测试的下载方式、设备要求及全球可玩性展开。\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n### 🎮 A. 玩家舆情（非 Creator Space）\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🩺 玩家核心议题 TOP5\n\n| # | 议题 | 占比 | 情绪 | 典型原文（语言） | 分析总结 |\n|---|------|------|------|----------------|----------|\n| 1 | **7月9日区域测试详情** | 45% | 中性 | \"How do I download the test?\" - democroni (🇬🇧) | 玩家主要关注下载方式（Play Store/APK）、是否需要VPN、以及全球玩家是否都能参与。社区经理已多次澄清“Everyone can play”，但仍有大量重复提问。 |\n| 2 | **设备兼容性与推荐** | 20% | 中性 | \"What are the lower specs?\" - c.q4 (🇬🇧) | 玩家询问最低配置要求，并讨论RedMagic、iPad等设备性能。阿拉伯语频道有大量关于RedMagic vs iPad的深度讨论。 |\n| 3 | **请求新增语言频道** | 10% | 中性偏负 | \"Could Six add a Brazilian channel?\" - marleyzin (🇬🇧) | 巴西玩家marleyzin多次请求创建葡萄牙语频道，情绪略显急切。社区经理已引导至建议频道，但需求未解决。 |\n| 4 | **游戏模式与机制讨论** | 10% | 中性 | \"Day 1 of asking for a gun game mode\" - kyler4soulx_06713 (🇬🇧) | 少数玩家开始讨论游戏模式（如枪战模式）和组队人数限制（如4人队），显示对游戏内容的深入期待。 |\n| 5 | **iOS版本支持** | 5% | 负面 | \"Keşke ios yapsalar\" - yusufdmr75062 (🇹🇷) | 部分iOS玩家对本次测试仅限Android表示失望，希望未来能支持iOS。 |\n\n📶 玩家语言分布：\n\n| 语言 | 频道 | 消息数 | 占比 | 情绪倾向 | 核心关注点 |\n|------|------|--------|------|----------|------------|\n| 🇸🇦 AR | #الدردشة-العامة | 908 | 60.7% | 正面/中性 | 设备讨论、测试下载、社区闲聊 |\n| 🇬🇧 EN | #general, #general-en | 369 | 24.7% | 中性 | 测试详情、下载方式、游戏机制 |\n| 🇪🇸 ES | #chat-general | 75 | 5.0% | 中性 | 测试信息澄清、语言支持、与GTA6对比 |\n| 🇷🇺 RU | #общий-чат | 66 | 4.4% | 中性 | 设备讨论、组队招募、测试信息 |\n| 🇫🇷 FR | #discussion-générale | 7 | 0.5% | 中性 | 测试安装、Bug修复 |\n| 🇹🇷 TR | #genel-sohbet | 13 | 0.9% | 中性 | 测试倒计时、iOS支持 |\n| 🇨🇳 ZH | #一般聊天 | 1 | 0.1% | 中性 | 简单问候 |\n\n❗玩家风险信号：\n- **无**：今日未发现L1+或L2级风险信号。负面情绪主要集中在iOS玩家被排除在外，但未形成大规模讨论。\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n### 🎬 B. Creator 舆情（Creator Space）\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n- **活跃度**：Creator Space频道#cc-chat有35条消息，主要由新加入的Creator（如yamamirum, shizi_rm）和社群经理（1_cc, harperere）的欢迎互动构成。\n- **核心议题**：俄罗斯Creator yamamirum和zmeenos讨论了如何填写测试申请表，涉及Creator Hub ID、邮箱和TestFlight邀请邮箱等细节，显示Creator正为参与测试做准备。\n- **情绪**：整体情绪积极，新成员受到欢迎，社群氛围融洽。\n\n---\n\n## 四、话题量监控\n\n| 平台 | 指标 | 本期 | 备注 |\n|------|------|------|------|\n| Discord | 总消息量 | 1495 条 | 较上期（假设）有所增长，主要受7月9日测试临近影响。 |\n| Discord | 活跃用户 | 156 人 | 活跃用户数较高，社区参与度良好。 |\n\n---\n\n## 五、明日热点预判\n\n1. **7月9日测试倒计时**：随着测试日期临近，关于下载方式、VPN使用、服务器开放时间的讨论将持续升温。\n2. **设备配置讨论**：玩家将继续讨论和推荐适合运行RM的手机/平板设备，尤其是针对预算有限的玩家。\n3. **语言频道新增请求**：巴西/葡萄牙语频道的请求可能再次出现，建议团队提前准备回应或处理方案。\n```"}</script>
+
+  <!-- 编辑工具栏 -->
+  <div class="edit-toolbar" id="edit-toolbar">
+    <span class="tb-info">编辑模式 — 点击高亮区域直接修改</span>
+    <button class="tb-btn save" onclick="saveEdits()">💾 保存并下载</button>
+    <button class="tb-btn" onclick="toggleEdit()">✕ 退出编辑</button>
+  </div>
+
   <script>
+    var editMode = false;
+
+    function toggleEdit() {
+      editMode = !editMode;
+      var btn = document.querySelector('.edit-btn');
+      var toolbar = document.getElementById('edit-toolbar');
+      var editables = document.querySelectorAll('[data-editable="true"]');
+
+      if (editMode) {
+        btn.classList.add('active');
+        btn.textContent = '✏️ 编辑中';
+        toolbar.classList.add('show');
+        editables.forEach(function(el) {
+          el.contentEditable = 'true';
+          el.classList.add('editing');
+        });
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '✏️ 编辑';
+        toolbar.classList.remove('show');
+        editables.forEach(function(el) {
+          el.contentEditable = 'false';
+          el.classList.remove('editing');
+        });
+      }
+    }
+
+    function saveEdits() {
+      // 退出编辑模式
+      var editables = document.querySelectorAll('[data-editable="true"]');
+      editables.forEach(function(el) {
+        el.contentEditable = 'false';
+        el.classList.remove('editing');
+      });
+
+      // 克隆整个页面
+      var html = document.documentElement.outerHTML;
+      // 移除 editing 状态的残留
+      html = html.replace(/contenteditable="true"/g, '');
+      html = html.replace(/class="editing"/g, '');
+      html = html.replace(/ editing/g, '');
+
+      // 下载为 HTML 文件
+      var blob = new Blob(['<!DOCTYPE html>\n' + html], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = document.title.replace(' — RM Community Monitor', '') + '.html';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // 退出编辑
+      editMode = true;
+      toggleEdit();
+      alert('✅ 已下载修改后的 HTML！\n\n替换 web-publisher/site/ 中对应文件后执行:\ngit add -A && git commit -m "edit" && git push');
+    }
+
+    function toggleReport() {
+      var el = document.getElementById('full-report');
+      var btn = document.querySelector('.full-report-toggle');
+      if (el.classList.contains('show')) {
+        el.classList.remove('show');
+        btn.textContent = '📄 展开完整报告';
+      } else {
+        el.classList.add('show');
+        btn.textContent = '📄 收起完整报告';
+        if (!el.dataset.rendered) {
+          el.innerHTML = renderMd(REPORT_BODY);
+          el.dataset.rendered = '1';
+        }
+      }
+    }
+
+    var REPORT_BODY = "# RM社群日报 — 2026-07-02\n\n> **监控时段**：2026-07-01 08:00 ~ 2026-07-02 08:00 (GMT+8)\n> **报告生成**：Yvonne团队\n> **数据来源**：Discord Bot一手采集 + 搜索引擎辅助\n\n---\n\n## 一、今日总述\n\n距7月9日港澳区域公测仅剩7天，Discord社区热度持续高位运行，单日消息量达1495条（环比+2%），活跃用户156人（+15.6%）。核心话题仍围绕\"7月9日测试倒计时\"和\"下载方式/设备选购\"。阿拉伯语社区贡献超60%消息量，出现大量设备选购讨论和测试前准备话题。西班牙语社区活跃度大幅回升。社区整体情绪偏正向，期待感持续升温。官方外部社媒继续静默。\n\n---\n\n## 二、各平台动态\n\n| 平台 | 账号 | 动态 | 状态 |\n|------|------|------|------|\n| X | @play_rustmobile | 无新推文 | 🔇 静默 |\n| YouTube | @play_rustmobile | 无新视频 | 🔇 静默 |\n| TikTok | @play_rustmobile | 无新内容 | 🔇 静默 |\n| 官网 | rustmobile.com/en/news | 最新仍为6/17港澳测试FAQ | 🔇 无变化 |\n| Reddit | r/playrustmobile | 监控窗口内无新帖 | 🔇 低活跃 |\n| Discord | 官方服务器 | ✅ Bot采集正常，1495条消息 | 🟢 高活跃 |\n\n---\n\n## 三、Discord 社区舆情\n\n> ✅ 数据来源：Discord Bot 一手采集（Discord Bot 采集）\n> 监控时段：2026-07-01 08:00 ~ 2026-07-02 08:00 (GMT+8)\n\n──────────────────────────────────\n\n🌍 社区概览：\n- 总消息数：1495 条（玩家 1460 条 / Creator 35 条）\n- 活跃频道数：12 个\n- 活跃用户数：156 人\n- 核心话题：7月9日港澳区域测试倒计时（7天），玩家讨论设备选购、下载方式、区域限制\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n### 🎮 A. 玩家舆情（非 Creator Space）\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🩺 玩家核心议题 TOP5\n\n| # | 议题 | 占比 | 情绪 | 典型原文(语言) | 分析总结 |\n|---|------|------|------|----------------|----------|\n| 1 | 7/9区域测试倒计时与期待 | 30% | 正面 | \"Rust Mobile Open Beta ⌛ ⌛\" - vazrentr (🇬🇧); \"Quien está emocionado que salga?\" - alexks_136 (🇪🇸) | 各语言社区统一的倒计时期待情绪，玩家分享兴奋 |\n| 2 | 设备选购与配置讨论 | 25% | 中性 | \"حجي اريد اشتري قبل نزول النسخه\" (想在测试前买设备) - 1_cc (🇸🇦); \"شوف يمك اكو تابات legion\" - _shad8w_ (🇸🇦) | 大量阿拉伯语玩家讨论iPad/Android平板选购，准备迎接测试 |\n| 3 | 下载方式/Play Store区域 | 20% | 中性 | \"how to download rust mobile\" - zenxq (🇬🇧); \"Pero será que podremos descargarlo desde la web oficial?\" - lesder3728 (🇪🇸) | 各语言新成员重复询问，MOD积极引导等待7/9官方信息 |\n| 4 | VPN/IP限制疑问 | 10% | 中性 | \"would I need a VPN or something to play\" - ruby.123_ (🇬🇧); \"Nothing is certain, but they will most likely need a VPN\" - 1_cc (MOD) | 非港澳玩家关注安装是否需要VPN，MOD回应信息尚未确定 |\n| 5 | 社区闲聊/文化交流 | 15% | 正面 | \"Me enjoying hot tea in 40'C Europeans crying for nothing\" - starlord_6946 (🇬🇧) | 社区氛围轻松活跃，跨文化互动增加归属感 |\n\n📶 玩家语言分布与舆情：\n\n| 语言 | 频道 | 消息数 | 占比 | 情绪倾向 | 核心关注点 |\n|------|------|--------|------|----------|------------|\n| 🇸🇦 AR | #الدردشة-العامة | 908 | 62.2% | 正面 | 设备选购、iPad vs Android讨论、测试倒计时 |\n| 🇬🇧 EN | #general + #general-en | 369 | 25.3% | 正面/中性 | 下载方式、VPN需求、区域测试信息 |\n| 🇪🇸 ES | #chat-general | 75 | 5.1% | 正面 | 发布日期确认、CN版vs全球版讨论 |\n| 🇷🇺 RU | #общий-чат | 66 | 4.5% | 中性 | 设备推荐、组队需求、AI/游戏市场闲聊 |\n| 🇹🇷 TR | #genel-sohbet | 13 | 0.9% | 中性 | 常规社区聊天 |\n| 🇫🇷 FR | #discussion-générale | 7 | 0.5% | 中性 | 低活跃 |\n| 🇯🇵 JA | #一般聊天 | 1 | 0.1% | — | 极低活跃 |\n\n各语言群体详细分析：\n\n**🇸🇦 Arabic (62.2%) - 高活跃 · 测试前设备选购热潮**\n- 代表性发言：\n  - \"حجي اريد اشتري قبل نزول النسخه\" (想在测试前买设备) - 1_cc\n  - \"شوف يمك اكو تابات legion مال lenovo\" (看看有没有联想Legion平板) - _shad8w_\n  - \"لو عندك فلوس خذ 24gb 1 tb\" (有钱就买24GB 1TB) - nour.3nn\n  - \"ميهمني مساحه الجوال 512 بس خلي تفتح وهاهيه\" (不在乎存储512就行只要能玩) - ry_z_k\n- 讨论热点：iPad M4 Pro vs Android平板、设备价格对比(30000+伊拉克第纳尔)、跨境购买设备、组队准备\n- 风险信号：无\n\n**🇬🇧 English (25.3%) - 信息枢纽 · 新人引导**\n- 代表性发言：\n  - \"Rust Mobile Open Beta ⌛ ⌛ <t:1783562400:f>\" - vazrentr (倒计时分享)\n  - \"no invites going out for the upcoming regional test, you just install and play\" - stopopiates\n  - \"There is no IP restriction for the regional beta, so you won't need it\" - itzkevinx\n  - \"Broo cmn make it July 5\" - alithenumber2 (急切想提前玩)\n- 讨论热点：下载方式确认、VPN需求、Play Store区域切换、Twitch Drop可能性\n- MOD亮点：itzkevinx、1_cc持续引导新人至FAQ频道，澄清无IP限制\n- 风险信号：无\n\n**🇪🇸 Español (5.1%) - 活跃度回升**\n- 代表性发言：\n  - \"Quien está emocionado que salga?\" (谁对发布感到兴奋？) - alexks_136\n  - \"Le tengo más fe a la beta china porque tienen mas gente que los apoya\" (对中国beta更有信心因为支持者多) - gio.vv\n  - \"Todo los de las betas se va a borrar\" (beta数据都会清除) - l1____mtz\n- 讨论热点：发布日期、CN版皮肤、beta数据是否保留\n- 风险信号：无\n\n**🇷🇺 Русский (4.5%) - 设备推荐 + 游戏市场观察**\n- 代表性发言：\n  - \"Ищу тиму на глобалку с дс\" (找Discord组队打全球服) - stalker00721\n  - \"Жаль только мобильных игр нормальных толком нет\" (可惜正经手游太少了) - panda5.45\n  - \"виво редмеджик хонор 5 плюс\" - cutebananchik (推荐设备)\n- 讨论热点：设备推荐（Red Magic/Infinix/iQOO）、手游市场现状、组队招募\n- 风险信号：有玩家请求帮忙扫描微信QR码 (kolia_kott)，属于个人需求未扩散\n\n**🇹🇷 Türkçe (0.9%) - 低活跃**\n- 常规社区闲聊\n- 风险信号：无\n\n玩家频道分类分析：\n\n| 类型 | 频道 | 消息数 | 核心信号 |\n|------|------|--------|----------|\n| 社区类(general/off-topic) | #general, #off-topic | 356 | 下载方式询问、倒计时分享、跨文化闲聊 |\n| 多语言社区 | #الدردشة-العامة, #chat-general, #общий-чат, #genel-sohbet, #discussion-générale, #general-en, #一般聊天 | 1091 | 设备选购热潮、各语言测试期待 |\n| 官方类(helper-chat) | #helper-chat | 10 | MOD协调：葡语频道建议、下载方式确认、VPN信息 |\n| 游戏类(level-up) | #level-up | 3 | 等级系统互动 |\n\n❗玩家风险信号：无。社区情绪整体正向，测试前期待感持续升温。\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n### 🎬 B. Creator 舆情（Creator Space）\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🩺 Creator 核心议题 TOP3\n\n| # | 议题 | 占比 | 情绪 | 典型原文(语言) | 分析总结 |\n|---|------|------|------|----------------|----------|\n| 1 | 新Creator欢迎与入驻 | 50% | 正面 | \"Welcome to CreatorHub 👋\" - 1_cc (🇬🇧); \"welcome! and please check #news #guidelines for our latest news\" - harperere (🇬🇧) | 新Creator持续加入，社区扩展健康 |\n| 2 | 港澳测试注册流程 | 35% | 中性 | \"Должен ответ придти или просто 9 июля ждать?\" (是等回复还是直接等7月9日？) - yamamirum (🇷🇺) | 俄语Creator咨询Creator Hub注册与测试邀请流程 |\n| 3 | Creator Hub账号配置 | 15% | 中性 | \"ID CREATOR HUB - EMAIL CH\" - zmeenos (🇷🇺) | Creator之间互助解决账号绑定问题 |\n\n📶 Creator 语言分布：\n\n| 语言 | 频道 | 消息数 | 占比 | 情绪倾向 | 核心关注点 |\n|------|------|--------|------|----------|------------|\n| 🇬🇧 EN | #cc-chat | 10 | 28.6% | 正面 | 新人欢迎 |\n| 🇷🇺 RU | #cc-chat | 18 | 51.4% | 中性 | Creator Hub注册、测试邀请 |\n| 混合 | #cc-chat | 7 | 20% | 正面 | emoji互动 |\n\nCreator 详细分析：\n- 活跃 Creator 数：8 人\n- 主要讨论方向：新Creator入驻、港澳测试Creator参与方式、Creator Hub账号配置\n- 代表性发言：\n  - \"Я Чето вообще не то подавал И вот токо что написал и одобрили\" (我都不知道怎么申请通过的，写了就批了) - yamamirum\n  - \"Welcome! and please check #news #guidelines\" - harperere\n- Creator 情绪倾向：正面 — 新Creator积极加入，现有Creator热心互助\n- ⚠️ Creator 风险信号：无\n\n❗Creator 风险信号：无。Creator社区扩展中，互助氛围良好。\n\n---\n\n## 四、口碑舆情总结\n\n情绪分布：正面 72% / 中性 25% / 负面 3%\n\n✅ 正面(72%)：7/9测试高期待、积极设备准备、社区互助氛围好\n代表评论：\"Luckily, there are only a few days left until the regional beta for Rust is released! 😄\" — itzkevinx\n\n🔶 中性(25%)：下载方式/VPN疑问、设备选择困惑\n代表评论：\"would I need a VPN or something to play\" — ruby.123_\n\n⚠️ 负面(3%)：极少数对iOS不支持的遗憾\n代表评论：\"Broo cmn make it July 5\" — alithenumber2 (急切但非真正负面)\n\n🚨 紧急舆情 L1+：今日暂无\n\n---\n\n## 五、RM官方账号动态\n\n| 平台 | 动态 | 评估 |\n|------|------|------|\n| X @play_rustmobile | 全天无新推文 | ⚠️ 距OBT仅7天仍无预热 |\n| YouTube @play_rustmobile | 无新视频 | ⚠️ 同上 |\n| TikTok @play_rustmobile | 无新内容 | ⚠️ 同上 |\n| 官网新闻页 | 最新仍为6/17港澳测试FAQ | 无变化 |\n| Discord公告频道 | 无新公告 | MOD日常运营中 |\n\n**评估**：距OBT仅剩7天，官方外部社媒持续静默已进入第5周。Discord社区依靠MOD和热心玩家自驱运营。建议关注是否有OBT前预热计划。\n\n---\n\n## 六、话题量监控\n\n| 平台 | 搜索词 | 状态 |\n|------|--------|------|\n| 全平台 | \"#rustmobile\" | 存量内容为主，24h内无显著新增 |\n| X | @play_rustmobile | 官方静默 |\n| YouTube | \"Rust Mobile\" | 无新视频 |\n| TikTok | \"#rustmobile\" | 存量为主 |\n| Reddit | r/playrustmobile | 无新帖 |\n| Discord | 官方服务器 | 🟢 高活跃（1495条/日） |\n\n---\n\n## 七、明日热点预判\n\n1. **OBT倒计时6天**：社区期待感将继续攀升，下载方式询问将更频繁\n2. **设备选购话题**：阿拉伯语社区设备讨论热度不减，可能延伸为\"最低配置能否流畅运行\"的讨论\n3. **VPN/下载信息确认**：随着时间临近，玩家对Play Store区域切换需求的讨论将升温\n4. **关注点**：官方是否会在OBT前一周发布预热内容（社媒/官网/Discord公告）\n\n---\n\n## 八、风险评估\n\n| 级别 | 事项 | 状态 |\n|------|------|------|\n| L2 ⚠️ | 官方外部社媒持续静默（距OBT 7天） | 持续关注 |\n| — | 社区负面情绪 | 无风险 |\n| — | Creator不满 | 无风险 |\n";
     function renderMd(md) {
       return md
-        .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((\|.+\|\s*\n)*)/gm, (m, h, b) => {
-          const hs = h.split('|').map(x=>x.trim()).filter(Boolean);
-          const rs = b.trim().split('\n').map(r=>r.split('|').map(x=>x.trim()).filter(Boolean));
-          let t='<table><thead><tr>'+hs.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>';
-          rs.forEach(r=>{t+='<tr>'+r.map(x=>'<td>'+x+'</td>').join('')+'</tr>';});
-          return t+'</tbody></table>\n';
+        .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n)*)/gm, function(m,h,b){
+          var hs=h.split('|').map(function(x){return x.trim()}).filter(Boolean);
+          var rs=b.trim().split('\n').map(function(r){return r.split('|').map(function(x){return x.trim()}).filter(Boolean)});
+          var t='<table><thead><tr>'+hs.map(function(x){return '<th>'+x+'</th>'}).join('')+'</tr></thead><tbody>';
+          rs.forEach(function(r){t+='<tr>'+r.map(function(x){return '<td>'+x+'</td>'}).join('')+'</tr>'});
+          return t+'</tbody></table>';
         })
         .replace(/^### (.+)$/gm,'<h3>$1</h3>')
         .replace(/^## (.+)$/gm,'<h2>$1</h2>')
@@ -71,10 +304,6 @@
         .replace(/\n\n/g,'</p><p>')
         .replace(/\n/g,'<br>');
     }
-    const data = JSON.parse(document.getElementById('report-data').textContent);
-    document.getElementById('title').textContent = data.title;
-    document.getElementById('meta').textContent = data.meta;
-    document.getElementById('body').innerHTML = '<p>'+renderMd(data.body)+'</p>';
   </script>
 </body>
 </html>
