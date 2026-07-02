@@ -4,357 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>RM Community Monitor</title>
+  <title>RM社群日报 — 2026-07-02 — RM Community Monitor</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f1117;
-      color: #e1e4e8;
-      min-height: 100vh;
-    }
-
-    /* 密码锁屏 */
-    #lock-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    #lock-screen .logo {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    #lock-screen h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-      color: #f0f0f0;
-    }
-
-    #lock-screen .subtitle {
-      color: #8b949e;
-      margin-bottom: 32px;
-      font-size: 14px;
-    }
-
-    #lock-screen .input-group {
-      display: flex;
-      gap: 8px;
-    }
-
-    #lock-screen input {
-      padding: 12px 16px;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      background: #161b22;
-      color: #f0f0f0;
-      font-size: 16px;
-      width: 240px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    #lock-screen input:focus {
-      border-color: #58a6ff;
-    }
-
-    #lock-screen button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background: #238636;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    #lock-screen button:hover {
-      background: #2ea043;
-    }
-
-    #lock-screen .error {
-      color: #f85149;
-      margin-top: 12px;
-      font-size: 14px;
-      display: none;
-    }
-
-    /* 报告内容区 */
-    #content {
-      display: none;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 24px;
-    }
-
-    #content .header {
-      border-bottom: 1px solid #21262d;
-      padding-bottom: 24px;
-      margin-bottom: 32px;
-    }
-
-    #content .header h1 {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    #content .header .meta {
-      color: #8b949e;
-      font-size: 14px;
-    }
-
-    /* Markdown 渲染样式 */
-    .markdown-body h1 { font-size: 24px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
-    .markdown-body h2 { font-size: 20px; margin: 28px 0 12px; color: #58a6ff; }
-    .markdown-body h3 { font-size: 16px; margin: 20px 0 8px; color: #d2a8ff; }
-    .markdown-body p { margin: 8px 0; line-height: 1.7; }
-    .markdown-body ul, .markdown-body ol { margin: 8px 0 8px 24px; }
-    .markdown-body li { margin: 4px 0; line-height: 1.6; }
-    .markdown-body blockquote { 
-      border-left: 3px solid #3b82f6; 
-      padding: 8px 16px; 
-      margin: 12px 0; 
-      background: #161b22;
-      border-radius: 0 6px 6px 0;
-    }
-    .markdown-body code { 
-      background: #1f2937; 
-      padding: 2px 6px; 
-      border-radius: 4px; 
-      font-size: 13px; 
-    }
-    .markdown-body pre { 
-      background: #161b22; 
-      padding: 16px; 
-      border-radius: 8px; 
-      overflow-x: auto; 
-      margin: 12px 0;
-    }
-    .markdown-body table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin: 12px 0; 
-      font-size: 14px;
-    }
-    .markdown-body th, .markdown-body td { 
-      border: 1px solid #30363d; 
-      padding: 8px 12px; 
-      text-align: left; 
-    }
-    .markdown-body th { 
-      background: #161b22; 
-      font-weight: 600; 
-    }
-    .markdown-body tr:nth-child(even) { background: #0d1117; }
-    .markdown-body hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
-    .markdown-body strong { color: #f0f0f0; }
-    .markdown-body a { color: #58a6ff; text-decoration: none; }
-    .markdown-body a:hover { text-decoration: underline; }
-
-    /* 导航 */
-    .nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(15, 17, 23, 0.95);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid #21262d;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 100;
-    }
-
-    .nav .brand {
-      font-weight: 600;
-      color: #58a6ff;
-    }
-
-    .nav .lock-btn {
-      padding: 6px 12px;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      background: transparent;
-      color: #8b949e;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .nav .lock-btn:hover {
-      border-color: #f85149;
-      color: #f85149;
-    }
-
-    #content.has-nav { padding-top: 80px; }
-
-    /* 响应式 */
-    @media (max-width: 768px) {
-      #content { padding: 60px 16px 24px; }
-      .markdown-body table { font-size: 12px; }
-      .markdown-body th, .markdown-body td { padding: 4px 6px; }
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e4e8; min-height: 100vh; }
+    .nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(15,17,23,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #21262d; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
+    .nav .brand { font-weight: 600; color: #58a6ff; text-decoration: none; }
+    .nav .back { color: #8b949e; text-decoration: none; font-size: 13px; }
+    .nav .back:hover { color: #58a6ff; }
+    .container { max-width: 900px; margin: 0 auto; padding: 80px 24px 40px; }
+    .header { border-bottom: 1px solid #21262d; padding-bottom: 24px; margin-bottom: 32px; }
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header .meta { color: #8b949e; font-size: 14px; }
+    .md h1 { font-size: 24px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
+    .md h2 { font-size: 20px; margin: 28px 0 12px; color: #58a6ff; }
+    .md h3 { font-size: 16px; margin: 20px 0 8px; color: #d2a8ff; }
+    .md p { margin: 8px 0; line-height: 1.7; }
+    .md ul, .md ol { margin: 8px 0 8px 24px; }
+    .md li { margin: 4px 0; line-height: 1.6; }
+    .md blockquote { border-left: 3px solid #3b82f6; padding: 8px 16px; margin: 12px 0; background: #161b22; border-radius: 0 6px 6px 0; }
+    .md code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    .md table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    .md th, .md td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+    .md th { background: #161b22; font-weight: 600; }
+    .md tr:nth-child(even) { background: #0d1117; }
+    .md hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+    .md strong { color: #f0f0f0; }
+    .md a { color: #58a6ff; text-decoration: none; }
+    .md a:hover { text-decoration: underline; }
+    @media (max-width: 768px) { .container { padding: 60px 16px 24px; } .md table { font-size: 12px; } .md th, .md td { padding: 4px 6px; } }
   </style>
 </head>
 <body>
-  <!-- 密码锁屏 -->
-  <div id="lock-screen">
-    <div class="logo">📡</div>
-    <h1>RM Community Monitor</h1>
-    <p class="subtitle">输入访问密码查看报告</p>
-    <div class="input-group">
-      <input type="password" id="pwd-input" placeholder="访问密码" autocomplete="off">
-      <button onclick="unlock()">解锁</button>
-    </div>
-    <p class="error" id="error-msg">密码错误，请重试</p>
-  </div>
-
-  <!-- 解锁后的内容 -->
-  <div id="content" class="has-nav">
-    <nav class="nav">
-      <span class="brand">📡 RM Community Monitor</span>
-      <button class="lock-btn" onclick="lockPage()">🔒 锁定</button>
-    </nav>
+  <nav class="nav">
+    <a href="/" class="brand">📡 RM Community Monitor</a>
+    <a href="/" class="back">← 返回首页</a>
+  </nav>
+  <div class="container">
     <div class="header">
-      <h1 id="report-title"></h1>
-      <p class="meta" id="report-meta"></p>
+      <h1 id="title"></h1>
+      <p class="meta" id="meta"></p>
     </div>
-    <div class="markdown-body" id="report-body"></div>
+    <div class="md" id="body"></div>
   </div>
-
-  <!-- 加密数据（构建时注入） -->
-  <script id="encrypted-data" type="application/json">eyJzYWx0IjoiQkVLT0FpSTlmNUJMQTBGMU9NVFFYQT09IiwiaXYiOiJTenBzVERoWVJNRTJXWE1EdW1XYmFRPT0iLCJjaXBoZXJ0ZXh0IjoiUWNuYTc3L0ZOdmdmRjFWODZpQmNXUzdTd25OcEQ0ZVdHekM2U0JLN2Qrb2lPcWZGa092SDFYSDlkSjRVelhEWUVGdW9tUG9XcVRxVFNwWEllK3BYRW9xMEFPRUR1NHMyMWpGLy8wQUNWbEU3bkRJR0Z4bWN1Q2JRamdhcEZQa2hDRkUyMUJmMlIyM2lkTFU4aEZhY05YNlQyUHJvemRyTGNPOFR1UDhXdFpXL0pta1l0YkdxamJ1dlpzdXNCQmxxYTdXUGZaQ0Vib2RwUVloS2VIQ3hrSmVIRXA3S1RiYmcrcDNXTHBXNGorOVBpcVNaY0plbkhkZkhleU80cVRubGxoUW1FZEFqZDh2a2pwV2IxYWNHUGoxS1Y4S2V3ZSszMFpIYTRJUjNoVVZqWVkvbjcwTndHOVZmSXRZb0NnOGhvQWZhVFErRVBFUUFSTHEwV1lZd2VIQ1JXUlo5WnlLemVyeExyODB4dTB0TGZUbnhQRzVRYnZKUThjMjl6VVYxWXdycDVOOEtIWEp6S2RvbjlxUTgzbWR0R2hNRjhkRlhjUHhvTG1oL1I4dVUwZnhxY09BNXlQRWdweGVUdnczSzBYTUk2L1NCaWc1clFMbHZ5WWoycVd6aSt3R0paY1YvV0Q1NkNGSDhyenpGVTd3eko3UG9ZakNDUVBpZXp0WXVqeE5VMXovcHRDWnpjOWRTeUh1b3FKT3lKTXVsTGE2cVVkR3pjbExHaDlaSE42MGE0Z1MzOW5KNC9vazZOM2FzSzlzc2tiL1Axb2w1TkhTL2ZaeGkyWVFidTlTRnFqUlhyNTVaMzlNSW40MGxoaGlNUjdXS3NpeU9rNmdtcTRCa3JMSTFhbzNwZHpxblpLZlNjMm1HZmZHdm1Od0xadktwbk4zZHE0THVkTy8yVUg3YS93SWN6RGgxWUFia1ZOdHZTRloyL3Y3bW1ZcjVlWFZLeHJqeHk0V2dpMDVpQ3drUnlWN2xuOVU3a0l0dnJmcExRVURybDlqTXVCNG9YclpVTHQveFh4Q1hsWGloa0U4K2RNOVJxY3dWZkdXbXBML2hKL1JNblZhajFGRWJpNjAySGNBVTNrbDI2MzQveHZRbkVybWFHRmpSbCtYWVFvakYwSzB0dGZsUzJqOThvcVpSR2E5aTVqVSs2MjZWb2hkNEV5YzhubitlblVLQWs0dEY4ZS9FT0dGaXFwM2pTMUhZdUNhK3VrRlBZQktHaHNZMm1GR1hLaUcrQ1cxRzZsNnpCeTZGcEE4UlBabHBWcFlONnZ5RXJxbEgrRnFqZDlzT2dPN2h1RFk4bXYrV0phaGZjTG9HSHZQdFRTR2Y1SHg1aWFXQ2xWaEVaYVFBZ3A1UVNLZUJ2TmNpOHRTd204MmRiTUQ0OUU3YkZCVm4wZ0pPL08xbHhZZG82djVxanZsWUNJRWx0NXZ3WXJRaGJQZi8xU1BlbHoxS2FjRldRQTBRWmpzcWxtOHJuMWpQeGlLS0V2YXM0OXROMnFtQTV4cmZMVlBkN0VwZlkySHpjYnUrT01ReXd1NU93QU5vMUhlbFpWNkgyalBaNTFySVhOZmxzeFpwSms0aVhOUnp3VHVZV3FEbHo4amZpREhnUmk2VWk2Zy9zZHhTOVJ6TDF5eE9odm1xMVdpY1pucjFEdEovazFGakFwY052SW14eVcwVDFnK2N3ckJSRVBubGxlNXJnb0tCYnMzVkJNdGF0cG9PWkJscEpJbDBtMEZxclk4c0xqNDloczVrZm1VVGRrVVVQOGRUQnp3MzJRaEtuak9KRzh0RHpFVTZKUzhCZC9SVlVuRGh4Y3pwMEhYUU5CYzZySU1RUCsxaHc3NWhtUGwvMnFVUHZyajV1SHRnaEdYNjdhOFgyd1k2enl0M1FvTWZEUnZONU9HNEcyTWdRaS84dVRKMlRJY1N6YkpTdCt4Y3laNFYzV2NabE9WT1ltYVd5UkVyYzdqeStwb05vRi9uallhczRVWGZNZlRJV3ZzQWNndkMzbFBEdDJtL1ZpbUd4UW9lNkdyVEc2bFlUeTJueE1BNGFjSXhmS2xDQTZsZXQ5YkpPMjcxSXhmd3phUGJXQ3hqUGVMYUJNNml1QkkyTXpBUTNxNm1qa2gzVEtOckYvd1dxY1plVTFTWk8xSVBJbnhtUkM4SzFic2dDa2xGb3VjZ0JDTW9xSGI0cE9WUDg5TVFJWFRhTlVVcm9hR25EZkcxTWhyZU1qU0ZHdkl3N1p3WGRHbXZaRG9vLzdoUEc2N1YyTU8vQksrdnZUeDJ6dUVSM0htZWZNVWNTQjc3aVlVM1I4NFhnRVBhSWduQkxMclNUdkxsdnJLRmdkSDZQTTY1ejlpSXdsZG5MVkFCOFlnY1pVbmJaMGlDNTRZQVNFaVVBNWZVUWV6VTdZMlptM0M1dkpHQ3dNRXQ5bURSalhWb2lhK0E5SUtCYkhURzRvbER4dDVUQWh2Y3ZzL3B1TFlHUE5IZmE5eTlqQTR2VFMrNUFtbmw0Y1FqbDJjYkJPb2J6NytzQUxaNzYrNkUyc3hFVnh6WTRpbERmaG9EL2tnRWZQeVJYdkZpWDJvOFp4TUJSdENxeEJ0Qlh3VUZaRXFwL2U1SU40RVZQd2xGb2dTSm53My9KNmRKR0dMYXdJMElIWXNlVkwyMGgzL1A1ODVOOXgwUFIvMjVTNldxRzc3TmlTTWZ0RXJDM2dWdGJYNDJub1hqT3lyRXVOZGszL0d3WUZKeWJXa05ia2Q3SkkxYVpQcVArcVUwSzFsOXY4ZW5kOEdYQjdNZ0ZLRVV5alpXUFF4WUxSa2dwSzhhWlVTTjJNVFJpK0ZvOHN6UlVFMllxenVHTEU4T0FKc3ZBNFYvMDJ3SlJoYXhUc3ZFZlpPZVNjZWFOQlZmUnljZ0h3a1R1TFJKbml4TklQQUtLNjhjMkZGUysycG53aGQ0OEU3L0RjQTRRRjZTNGpSNlZTUWptclRKaGZNREVPZStMTG0yNXZBSXZCUlZZQ2lZdWhwRENQUEtHcmhsQ0FkOU5QYnlabThmUEk1MU1LeDNDM1p0ZzJxZnZoeFBWWk51V1dUY1NxREZ4R0xyaWV6YlNEQk01NzJiU0NhS1lNUDdJWVV4NXFrODV6akt5TFVDYU9vSXZzbFYzVzVxbW9SaTNZbVA4dzh4ZTRKeFR4UUV6OUh5bW1UZFlwdDZOcTdRR2hmUGlhcnlLTWNGSzBHNVEvSXdYZjNLN3FrcW9KTnZzeTIrTEw1WWNnV2pTdTRQNDlQTEl2aDFKeE9pYnFCZTlpRmR0TEtGZjA4M1FMbFpIT2pFcmJZSXgvRDR1ekM0SjFORW9NQ2R4MjVTdlVuUitiVkZ3SUVRaDlxV2M5MTdocUlvdFMyVWlKTlVUTGw2cWlpWE0yQzV0L1I5UHpINWkyZnEvZGJVUVdGdnpCOGd3Nmo4MGhjclNVYlVLdlFFOGlGTjFLQ3VHL0pYZGlGUVpwM2wrM2ZtazRCK1dsS2RWd0xUelJHNkcrSzFTcVpWdUgvSy9qdXFETG5IT0VFeU82YWpBNzRDUGFGTGpudHNlRnVKNTM3MUNTYVZyT2g2Z2EvRkIvZDk3TEEweUNmSlR3emhscHg5ZUJVVEdRN0ZJQ0ZsMmI1RURtY0Izb3ZRNG5mVEE1RTFBeTVjR2tMaU9hd3Vpa2ZZWE1ZMjZZdXpWUHd0MUJhOERId05Nc3VZdTB3QzZDRlJhZHRyWjVCOXROWTRKVzM2M3MzcWNKYlJwM1UxTElvOE8xa0Z1eE1HZm9MVVo1RFFJVDhWbXNIdStBTUc1TkQ2NVpGd29FRzE1TFNuak5jSW9PL3pkTEcxSHVWeVcraGlvdUJwTnFYRE1MS1dGeDVjRW0vWnBwRjYvNFl2eWt5MjVxWWQ5RzZXNWplQkJ2UTlZSUswSW9tTEVocW8xazJrTEhlYkM1Znk2S3NiQmg2WW4yUDU5OStrR0h2RTJaZS9aUTRETGhPaGJBU0tZQ1dOSm9RZy84blJoeWxoVms0eUk4S284dS82TkJBcEVVeTA4c3dJM1d1ZXpQRmd3SUNCNlhsYm5OYUNLNGltOVpIZVduQmUrQTd3azR3Yjl1R3hrdGp1N1pEbDEybURuWkQyd2wxK2dZL1dXei80VHRzU0MvUVJHTTRkbER6M3VTUUNLYzdWOE10Nzh5SjliVU9lVTdiS2FvTmgrOUpNZDZOazRDb1pBODlsalQ2Wit4TU0xQlc2WEhqdU9vY0I0WGs0TDlTb2pkRko5Q2ZmWTV3L1hNd0ZWM29BZjJDakRvWitXVDhMd24yMkxCZ01JOTZsRVROczZHdC81eVF2N1hGMytIRUpheUxxUFh3YW51RThydERSQitEYU1FVEx5Z1JucHYzVGc5dEZvZGxYYmJWTmZaMWlSbjZHMTlFZFhLWHV6aG5wYmR2Rk9iakZwSWRJbVRNa2VEUm1SdkJ6ZHhDbkkxcXdvMkxvaDEwN2w0Z3pONDZXSkJvNmdIREZEZWcyM2RQWUxtM2dSYk5XcTJJc2p0VUs0Y2dFcFdseFMybTVqTmx0cVRrYkdJcDl2VFl2RzFRb3F4ZFI3OXkyM1dMM3l1UVpxbjJzbmx4bmFTSk15cGxKUGt2a3NxNjhqektKaHR2ZXBXL2Z5NlplR0FrWTJUcVVndm1WN3hlR3FpaXVuaXFWWWlZV25sYTY4L2ZFMzg4RENZK1g5VEtmL2RLVW5mN2lJVk1uNmdCQ0pwZ0RPN1BYbVVSWnYySU5FM0JYN08xbHE0bVJTV25CTGFoeG15N2JkWHg5STEwTlY1U3BveVJTSU1NMlduaUxMZVQ2LzlKZk1jZWJZV0EzbTA1bVdXeWx1cm53THZ6QWlwSW1KWExXSlZ0VEtpMzRkR2w4YlV4cVhoMWk1SVdBZG1CWkpUVmU2dWNwYkgrbXY1S0VHQzQyZHl1ZVQ1QlBDS1AwU2pnOStOVG1QeVBxVVRaUFdnNmRiTzFIc2RtS2U0QUlyYU12SUtmZW1tZzVtOVBBQ053SXRRcmRaMWQ2R1VsMXJuUGJFOHV0QkxUNFBQaTFyMmRubXJMS1NxQ1B0SHhrSkZ6TzhNaXFRZVpnNkx2a2dsNzU1U3B5cHlPVmVOamZYME1wSytKQjNwZlp0cGFRNVBQbStTY0hNNXo1c2tYNytFbklHUG50VFFuOXd0ZzdhU1RDbzBVc2tRd0lITVR0VHYrc3lTMTZPcVVFRmhxUEtNdWlDVXJlaDVCb09SMytYdE56cXpuaW1xMmlBVStJSFZmamVvQkNPTFNSMWVvOUI4dlIzNWxEVmYyMU52WWlvLzFIbzdDV2NpbG9hNGVPTGMyRlhmbEtjVTVBU1hYVjdicWhPZXZka2RPRU5lN1hXNWN0M0hHRTQ4ZEZsZXNXTm93Z0w2NmtvaEdCYWVXaWNIOWdaNTFSdEg5cnFBWVg2U1oyeEdXL0VVODRMelpDQTYrdUtpRis0RGlTVXhLY2hFZ2tTdTVsaHRhWGtGcGRONEY2Sk1vbHkzSHdpMjhUM0xsUDRaaDdQOFBuQ3F6VktzTXp0UERDck8yRXE1eXNRb2xEU0NjbHAwVjg4Z09nMTRhSnB1U2NhZWZSNi9xdlljMnpQYlZKNDcwWWJYNU11eVdPSHQ2Mks0aEg5WTZZWUdLL3d1TzRuN1lIM1NIMjFGVW9jSEVtZXlDNWRTN29raTBxT1l5UzQ0MW9ldjllUFB0MjR2N0lLeWRuY2p6TkJIK3NteVJaaWpmOEpueTR5YzE1d2dSSHhrTlhCTkFoc05CSUpjamgwa04yWEpFK3M2ckxwclJHclNRdTE4R0I1NnF0V2YzNFVIOFU0NmVFcm1RNXBGckFBRW5LbUxOT1h6V2lWS0FEaytoZllObWhia3BZMXM4cnFRUGQvcndxNmVJR2orNm5uWnNTTk0yNkZBR25HbCtMZlJGdk9sai9xZ1lxQU02RTF1V1dRUUxmdURxMzd1T2NGdHBPY2JaNE5kTUtoQTdGdzIwcGJ4QnF3a1FtcjcxZUp3UjdCbnRCeVZKeDlXVmVkeTVBbVVTT0M0NzBCT3J6ZFNxemRheDd0amN2UkN1N1lIRDBPK3h5KzlSUTBqY2RhLzdGb1dVQlM0c0N1cndDL3A5Ty95QzBka0thYXRhdmtUWE9DNTN2eWN0dGhrTGpkSkJ2emtTYjBaR2RvMzdrMmdiZWo3aXlkM1BVd0hFWFAvaWVSaHJFbXVNQnZGbjRRSzlnM0o2UWczK2llUjVqcTFUd09aUW9BMitONXZ1VnhOVnlQTklySHcyODd6ZGdpdmRHMEVlUy81MjB3R1RCc1FPUk9rcno1RmZjZ2grcjlURVRuSk1nZjJGd0dhc3FjbFZFUnlORFJKcHFnOUZnb0ttUEd0c0lrbnk2djJ0Vi9PQzI5eFBER3lOU042dnJxMnppTEZzMEtycytoRXZLU2k1d0F0WTBJSnNlMjdtdTMyV1dNckxEczdzRnc4UEZsb2JFeFpLMzNtSGRobis0eTVaVVdhZWhIQ3VGMUllVkxWOU4zYzE5ZCtNVmFCY1o4cFdYNmRPOVlIQUQ4bElmaVFBVmwxU3ljQUZuZTVmbFJhYVkxWVVQNUJjYXhxR3lZdFNSWklLMUMxdWJPSkxIQlRXdkN5N3NVV3dyVW9pV0tKeDA4QnlBd01RaDI2NTFNU2ZZUGMzVGt4dkdWTFRqSmNvZWxpTXB2VXMxaDVzNkJvTllWUEFzZWhpOHpkRTlLR1hYS0xES1A0dm82cVBnbjhYaC9qL3BiUldDRm9mbi9RRmxtWVFGMWpSZzY0R3lWY0RVdjBLd3pLUVErMFQrYURtenZnL2xuWEU1ZThFdWFiaDFuNWZhb0ZOQ2NPYzFwYWNpd2V4OE9BYkcrLzJMUFE3UGhtdE1mbHhVWG83Ui93SXZac1Mya2lrNnR1MGJkbWF0TEJYekdYaDd0eVFHTkxFbnJ0dGU0WmtkT2pqczVzRGdYL0JpTkpxVk1oSTFIc25QNkg5TUxKaFpPeis5MjhwL09BVXdkcjk4bWw2RVJlSWhIUnltRDBxNDBmQVJaZWpLbEx4MFQ0Y0g5b3NFYWNURTRyVHA2ektKcCtHckhoSDQ1Unl4VVppRzlqOFRnSEsrZnZHSEQ2L2hqTy9CTk4xTHRocHNEYnJQS0czN0M1WldzRmVNejlxWTEzcCtMeEx2UjJ3NWw5UnFNVVE1YzNwb2FIYUJpc29QNVRSWStVM1g1a1lHV0tpaVJxR0g2OXFwRVZ4TTEzYkdJOEdWb0lwOWxPVkhHQlZKd2NVcW41MHlqYVFRM25KNURDNERRcU0wbGdNMXU5UVFLQnloTlduQWxCYUprazdYVENoR2tUeG1EL01mdjl3UDQ3c1Yxa08wc0o1R1ZxSUtZbzB0ODlIaW95d2lpY0RNQ3JpNjhld1JpZHVkYXM3eUVCTTVCWE13WDB1aXZ3QTVROExuRm1mMFRlanhOME0xeEZqeEdQZW5OOGpaYlF1NnNxR3ZWaDJjR1RGbDJ2MFA0MTMrMzByWnM1aG5wbUYvTFBTYkpRRk83RFNJb3MyRGNLME5FQkhIM1hkd1ZENjdYbmUyTy9BWHdUdnF1bC9PUzgveDFaMXpGUjhwZDVzUjN0QkxaUTV3SmZqL3FQT3BwRGNKdHAxbkdtYVZwNmU5TjFOeGRjMnRSbFdsa1Ryc0FOd3lmbUMzSE5XeUtjeVM1R21xT0ZsRjViRHh6MnF0Mkl6T1A3YUVIR3dRbDZ0WjlxRE84UlZVcVRtWmlsaUh6eG1OSXh0U3hRUWdyd2RyMURuU1V2VU1zTmVSSmJVRlZPN1NhclNkcVRFU1ptLzNTTFlGNWdyWGlGQ0RQandlYXlocEswZFp0UnpkUXhoejgyTC9jd3djMzZ4bGJNSXd1c2hBeUpDQ3RvNTN5YS9TSW9FUFZLcWVTM1lTM1QxWXc5Z2JMNFFTQm8yc3lKeE9Vblc1QU1mVTZTSXlzb3o4OXN3Z0JpSDZRNlM2dnppUWhMRzlNOWgvMHd1TzJLck5LcFEwVE9xNDV5bzVEZHRtay9hUEIvM1phK1FjeUU2REVHTVlRTHFWS1h0V1pJNkFqK2JNQnl2eVY2RDdkRzJjTmwxbjFaWHM4dTg5UjRSa2xxbXRTU3NnaHRVNk1qM1VBclUvRjJtRW5YZUhlalp0bFJ4dWJxOXhzRno3THEyWU80M3hld0E1UnhnSnZhcXdndzRkUnlRRld5LzFGdzNwQStYb1I0akk2cVU4MktQS25pb1dtSG01MngxRnhCK3FrVDhhTXM5ZnRZTjM3SWRTbkpwQitrMkNleWFYWFhTM1dhVE1sM2lUTGRyZ3Z2amFVUEpOMUNCVHowNnVnQWNiL25iTkV5eldhc09lbHlrci8zVzZTUm8vaEsrOXdGU0xzL3g1Q1JjdkpvNUhpVElXMXlldEFnMjRmWFhWVXR0dW1PcEJiL2JqY1Y1QlkvK2tCampzQjR4bTRRQkxYUUF5TkErSkdWbG1BanNkY2NQS1kwRHNtTzZHb1pYeUQ0MVZDUHNYZUpMdnRsWkpYblVkMHpMTDM5TlhkdGNpa3lQMWN6ZjBZTE0rZ2E0bmJjbW92NFAveHEwc0pRSFdJNGYrWi95ZWNEOU8vUHhRNDVSUmcxOHBlWkJaRmZaOE5NL0hNUks3R1hKV3VLbFJKVnhaSU1rQ3ZFbFlZUWFRbkVOL2xyVFd3TFF4TnN1MGpOYUo0bXhCWmVYNTUzVnFBNWFqYzhadTdsL1kxZGdjLzhNVnBZbEYxQkRndDdrWTZXbUlOVTJsWWY1a1BRMXhKRHVnTGg5MUdLY29qdTlwY25Rcm9tekVNU1pOaEZVTGJsWUtxRm9TUjI1SVFiZktYNEZyL09lOXBvakF3VWgrbzRjT3NHSXJ3Q05aNXVWajhIV2Yxayt0bGJDRW1HQWdyUTZqSjVZN1JsU0cycDg5QWRHTDlmNGxjVlplMzd4VHN1Tlg5azB6Z29pd3V5c3lJK2V1MzNEZlhOVzB2WmwvWnVhVTJtTTNYYzlGcnJUbHAwZldFNlhwaktQUVZyNG1SSGEybTZwN0xWeHRmZVB6OVhnYUVManI0U3BCTnUzU0FIUUY4bHNvTGZCTnlhdHFDWS9FQVZWY1RKejJxaXpkY01VS1hWVGRGbFh3OWI4Q1FIWjBPZEliTE5oVG9VU0JUbUxNd2ZqbFFTOGRuZGQyVmo0amNNekxqcGpZMC9QL0FpOXBjWi8zdHh4YmZxRExQNFljUUJFa0xyeUVaeEVTVmNuT0dCbWZGdGFUdlUzYTJhanRYa0N0RUJsQmxlai9yL0lTS1NOTGV1YWxURzd3M1I0UGYvWXJFM3J2blROaGZmNE5vdEdsTCtPc3Z5WnZ3aGpXMFF2RitCaVozL2ppUnNQNkxNang1ZGQveEZEYy9uMjBFQTM0eFZIamlHR0NwblZSQXlZcmlJOUZvRUhSeFpVSU5ZOUJqcG1KYm5vMjIrdTFGL3VsckxaQjAyTE1Db05XcXFmbFNtem4wVFBnSWt6RFU3US84TU1reng5NmdMR1pxUXA5VUNTQmpqRXVNVHdmK0haWXZkbFFsWG01UDdFekNXRVRyY3QxQm40aVAwRUMrWFpmU0tPNStXUExXRFVDSXhFejZBU1gyUFIzNXlqY3ZlWEwxWE56U0xCZWFIZFB2NjMzRVFKN0tZVVhNVW5JU1IzRGpiNzNSa3BiTmk0aG00Q005MG1USHBZQUdHcVp1V0xta0ZVUm02dmtSTmVRZFF4OFoyRjRmTTNNcmdpVkRmVi84MVJucllPSDJtZlg5b1B1TTBNUlpKRkhEdkJxZjlmNzV5MTVKa2pVcEdXQVc5ZEJ6ZHltSG9PVXNvenBoSVJsSE5xOGtaOVlPS1pxT29scWk5bitRQnFGTWJsT2NCVnF4bGxPRktGenV4cEZaazQwY0VLTlpWc2tyMzFhWFU1Rkg1WHhhazdEZC9UekV0MzN1a2hnSEt4blE5S1FhZjdBVU45WERVd3lZY21WQ2VYQ01xWng4bUFkNnhvKzdRWG5ReG1IQXNNTG5ZZkN1SHFUVTBrSG5iZ0NYcUJWcUx5WmIrdkpzTkdhZTNjdlNER2Q1OHdXZW9TcXNPdWZ0eUlqVTBMblBFcGxQN2lNaFBFdEQ1WUNSMmk0a0pmK08yL0YrT3R1blNzcUwzQkFsdFVGR3RBU0g4VmNocWZKSGloTG85S2lBYkFKRGZsN2hPcXM1ZmtJcGxSbTRRZmxObUNBZ2NnMzc4Z0N3a3ZZNkkzZFBpUmVzdUpVWlRub1EzTk9XYnZDRGZNdTFsWk9ONTJhOHh2SUNLd3dFUnFNc1B3YkpZZXE5MTVTQlU3Zjh0bm5rZzhHWHFjMWQwTHpPNk9qTG05VGJyZ1h6Q3JQcHNhZC9wdmVrbWlROG0zQU5mTWp3aEthYTNmaGJIMG42Wm1iaVhpUUw0RGZ0QWJyNmduTm5EbjE4L3NCNW5uc1lNWk94OTlKYVBWLzlLaXpwa2l4QVpGNmw5RDRVYmNZUmltK2Vxbms2UXJ2N0FmMVA3L0owL01MV3dZMTdmNnBDdlA5aS9ScCtuWDBXWjEyY3VtZU5jMnpEMndlaThSMmZzcEhFbGJpeGg2K2k2d3ZrcGpJeHA1eDJGWTNkWGl1MTl6RU1rZXB3TDU2Wm4rL0dBZGxvMFRtTHRoamV1cGoyU1drK1FNQUM0Q0VialZGWlBvTlM0MmFmZGc5bGdhamtmZmtzb3N4bERzVURDUm9aT2VzU1dmS0lJSEdwVUJiNTQ5ZVZMdzFPWHRiYVBrN28wWDg3OWV6d3MvMEJkazBqeG4zak1YTUtCcVVyYmxDd1ZOSmIzR0FGMktHNnRuNERBdENzK0pZOVNvT2tPNm1tV1VtbGRtVmZwbU5vektKckNtNkpyT2FBYUk4cnVCVENYVkFSMUtjM0tnNEVFYUpUSUpuVU1mdkcycmorMVBld3gwUzQ1VU0wckdIZjVPYUVzVTZUOEtjbm92cDJaTHhaaWJZSGNuK1pZOWxseTNzRVhrN050aE1objNkZ21mOUU4ZzhaL29oVUYwZTZ0bWx2eHRhSTNRaXg0SlBRS3JlVzNScTYyZUlja1Y4dStwY2ZMZEh4bVdsYjJSWm1pM2s2RkJyS1J0Q1NzMHhKSS9pcDk4aDl2eWtiT1NHU2hWd0xVOVJHRFUyTFQ1N3prUTBMQ2lQcTdUdktwZTlzWVRjZTUxc1RJWmxIT3krUk85QmxGcnlnK1JaWnJkbnFiMnNNNGcxdjNLOWVrc0ZreHQyNTNIWHNSTTl3bnA0c2RRV2xkR2gwSm1xcmZsTzYySk94UUNyWUg0Yi85TUs2c3AvcGFtQjhJN2JSUXBjanFBdkV1OStLdEdYSGNleWk3cWMxQnp5eW02d2RDSWo4cjE1NzBha1FTb0J6dG1aY0U3R3U5aHF5eDZZTDRSMWp1bExubmdZS1ZJb1dEL2p4cHRod3JrYnBPNGZseFFKajFIQlVEVUxDZERMTW52OGs3cVd1V2xBdEhob3lEaERWWWNRRHg2Lzg5cTEvMm5Oa0YweWpwZHZBZDJRLzZFWHZzRzdwWElSUWQzVXhYUW41RUNzMklNZkQycVFKamwrZTlIWDBOMFdJdDFVZ0ZQYktWajI0VDZIdy9CalJvdmlHOUR6R25BSnE2clpUcXpHa2QwPSJ9</script>
-
+  <script id="report-data" type="application/json">{"title":"RM社群日报 — 2026-07-02","meta":"报告类型：日报 | 日期：2026-07-02","body":"好的，Yvonne。这是根据您提供的 Discord 采集日志生成的 RM 社群日报。\n\n```\n# RM社群日报 — 2026-07-02\n\n> 📡 By Yvonne | RM海外社群经理\n> 监控时段：2026-07-01 00:00 ~ 2026-07-02 23:59 (UTC)\n> 数据来源：Discord Bot 一手采集\n\n---\n\n## 一、今日热门内容TOP3\n\n| # | 内容 | 来源 | 数据/备注 |\n|---|------|------|-----------| \n| 1 | **7月9日香港澳门区域测试** | Discord | 社区核心话题，由1_cc、savage.xia0等多位成员反复提及，引发全球玩家对下载方式、是否需要VPN的广泛讨论。 |\n| 2 | **设备推荐与讨论** | Discord | 阿拉伯语频道热烈讨论RedMagic、iPad Pro等设备性能，为迎接测试做准备，话题热度高。 |\n| 3 | **请求新增巴西/葡萄牙语频道** | Discord | 巴西玩家marleyzin在#general频道多次请求，社区经理savage.xia0回应已提交建议，引发小范围讨论。 |\n\n## 二、口碑舆情摘要\n\n### ✅ 正面\n- **测试期待值高**：玩家对7月9日的区域测试充满期待，情绪积极。多位玩家（如makar45376627）确认全球可玩后表示兴奋。\n- **社区互助氛围良好**：资深成员如1_cc、savage.xia0、sg8f等积极回答新玩家关于下载、VPN、设备配置等问题，社区氛围友好。\n- **Creator Space活跃**：新Creator加入，社群经理1_cc和harperere表示欢迎，俄罗斯Creator讨论测试申请流程，社群生态健康。\n\n### ⚠️ 需关注 L2\n- **巴西/葡萄牙语社群需求**：巴西玩家marleyzin多次请求创建巴西频道，虽已引导至建议频道，但该需求未被满足前可能引发小范围不满。\n- **iOS玩家被排除在外**：区域测试仅限Android，部分iOS玩家（如yusufdmr75062）表达失望，需关注后续iOS测试计划公告。\n\n### 🚨 紧急舆情 L1+\n- 今日暂无\n\n---\n\n## 三、Discord 社区舆情\n\n> ✅ 数据来源：Discord Bot 一手采集\n> 监控时段：2026-07-01 00:00 ~ 2026-07-02 23:59 (UTC)\n\n🌍 社区概览：\n- 总消息数：1495 条（玩家 1460 条 / Creator 35 条）\n- 活跃频道数：12 个\n- 活跃用户数：156 人\n- 核心话题：围绕7月9日区域测试的下载方式、设备要求及全球可玩性展开。\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n### 🎮 A. 玩家舆情（非 Creator Space）\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🩺 玩家核心议题 TOP5\n\n| # | 议题 | 占比 | 情绪 | 典型原文（语言） | 分析总结 |\n|---|------|------|------|----------------|----------|\n| 1 | **7月9日区域测试详情** | 45% | 中性 | \"How do I download the test?\" - democroni (🇬🇧) | 玩家主要关注下载方式（Play Store/APK）、是否需要VPN、以及全球玩家是否都能参与。社区经理已多次澄清“Everyone can play”，但仍有大量重复提问。 |\n| 2 | **设备兼容性与推荐** | 20% | 中性 | \"What are the lower specs?\" - c.q4 (🇬🇧) | 玩家询问最低配置要求，并讨论RedMagic、iPad等设备性能。阿拉伯语频道有大量关于RedMagic vs iPad的深度讨论。 |\n| 3 | **请求新增语言频道** | 10% | 中性偏负 | \"Could Six add a Brazilian channel?\" - marleyzin (🇬🇧) | 巴西玩家marleyzin多次请求创建葡萄牙语频道，情绪略显急切。社区经理已引导至建议频道，但需求未解决。 |\n| 4 | **游戏模式与机制讨论** | 10% | 中性 | \"Day 1 of asking for a gun game mode\" - kyler4soulx_06713 (🇬🇧) | 少数玩家开始讨论游戏模式（如枪战模式）和组队人数限制（如4人队），显示对游戏内容的深入期待。 |\n| 5 | **iOS版本支持** | 5% | 负面 | \"Keşke ios yapsalar\" - yusufdmr75062 (🇹🇷) | 部分iOS玩家对本次测试仅限Android表示失望，希望未来能支持iOS。 |\n\n📶 玩家语言分布：\n\n| 语言 | 频道 | 消息数 | 占比 | 情绪倾向 | 核心关注点 |\n|------|------|--------|------|----------|------------|\n| 🇸🇦 AR | #الدردشة-العامة | 908 | 60.7% | 正面/中性 | 设备讨论、测试下载、社区闲聊 |\n| 🇬🇧 EN | #general, #general-en | 369 | 24.7% | 中性 | 测试详情、下载方式、游戏机制 |\n| 🇪🇸 ES | #chat-general | 75 | 5.0% | 中性 | 测试信息澄清、语言支持、与GTA6对比 |\n| 🇷🇺 RU | #общий-чат | 66 | 4.4% | 中性 | 设备讨论、组队招募、测试信息 |\n| 🇫🇷 FR | #discussion-générale | 7 | 0.5% | 中性 | 测试安装、Bug修复 |\n| 🇹🇷 TR | #genel-sohbet | 13 | 0.9% | 中性 | 测试倒计时、iOS支持 |\n| 🇨🇳 ZH | #一般聊天 | 1 | 0.1% | 中性 | 简单问候 |\n\n❗玩家风险信号：\n- **无**：今日未发现L1+或L2级风险信号。负面情绪主要集中在iOS玩家被排除在外，但未形成大规模讨论。\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n### 🎬 B. Creator 舆情（Creator Space）\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n- **活跃度**：Creator Space频道#cc-chat有35条消息，主要由新加入的Creator（如yamamirum, shizi_rm）和社群经理（1_cc, harperere）的欢迎互动构成。\n- **核心议题**：俄罗斯Creator yamamirum和zmeenos讨论了如何填写测试申请表，涉及Creator Hub ID、邮箱和TestFlight邀请邮箱等细节，显示Creator正为参与测试做准备。\n- **情绪**：整体情绪积极，新成员受到欢迎，社群氛围融洽。\n\n---\n\n## 四、话题量监控\n\n| 平台 | 指标 | 本期 | 备注 |\n|------|------|------|------|\n| Discord | 总消息量 | 1495 条 | 较上期（假设）有所增长，主要受7月9日测试临近影响。 |\n| Discord | 活跃用户 | 156 人 | 活跃用户数较高，社区参与度良好。 |\n\n---\n\n## 五、明日热点预判\n\n1. **7月9日测试倒计时**：随着测试日期临近，关于下载方式、VPN使用、服务器开放时间的讨论将持续升温。\n2. **设备配置讨论**：玩家将继续讨论和推荐适合运行RM的手机/平板设备，尤其是针对预算有限的玩家。\n3. **语言频道新增请求**：巴西/葡萄牙语频道的请求可能再次出现，建议团队提前准备回应或处理方案。\n```"}</script>
   <script>
-    // AES-256-CBC 解密（使用 Web Crypto API）
-    async function decrypt(encryptedBase64, password) {
-      const encData = JSON.parse(atob(encryptedBase64));
-      const salt = Uint8Array.from(atob(encData.salt), c => c.charCodeAt(0));
-      const iv = Uint8Array.from(atob(encData.iv), c => c.charCodeAt(0));
-      const ciphertext = Uint8Array.from(atob(encData.ciphertext), c => c.charCodeAt(0));
-
-      // 从密码派生密钥 (PBKDF2)
-      const encoder = new TextEncoder();
-      const keyMaterial = await crypto.subtle.importKey(
-        'raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']
-      );
-      const key = await crypto.subtle.deriveKey(
-        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
-        keyMaterial,
-        { name: 'AES-CBC', length: 256 },
-        false,
-        ['decrypt']
-      );
-
-      try {
-        const decrypted = await crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, ciphertext);
-        return new TextDecoder().decode(decrypted);
-      } catch {
-        return null;
-      }
-    }
-
-    // 简易 Markdown → HTML（无依赖）
-    function renderMarkdown(md) {
-      let html = md
-        // 表格
-        .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((\|.+\|\s*\n)*)/gm, (match, header, body) => {
-          const headers = header.split('|').map(h => h.trim()).filter(Boolean);
-          const rows = body.trim().split('\n').map(row => 
-            row.split('|').map(c => c.trim()).filter(Boolean)
-          );
-          let table = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
-          rows.forEach(row => {
-            table += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>';
-          });
-          return table + '</tbody></table>\n';
+    function renderMd(md) {
+      return md
+        .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((\|.+\|\s*\n)*)/gm, (m, h, b) => {
+          const hs = h.split('|').map(x=>x.trim()).filter(Boolean);
+          const rs = b.trim().split('\n').map(r=>r.split('|').map(x=>x.trim()).filter(Boolean));
+          let t='<table><thead><tr>'+hs.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>';
+          rs.forEach(r=>{t+='<tr>'+r.map(x=>'<td>'+x+'</td>').join('')+'</tr>';});
+          return t+'</tbody></table>\n';
         })
-        // Headers
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        // HR
-        .replace(/^---+$/gm, '<hr>')
-        .replace(/^━+$/gm, '<hr>')
-        // Blockquote
-        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-        // Bold
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        // Italic
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        // Code
-        .replace(/`(.+?)`/g, '<code>$1</code>')
-        // Links
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
-        // Lists
-        .replace(/^- (.+)$/gm, '<li>$1</li>')
-        // Paragraphs
-        .replace(/\n\n/g, '</p><p>')
-        // Line breaks
-        .replace(/\n/g, '<br>');
-      
-      // Wrap lists
-      html = html.replace(/(<li>.+<\/li>(<br>)?)+/g, (match) => '<ul>' + match.replace(/<br>/g, '') + '</ul>');
-      
-      return '<p>' + html + '</p>';
+        .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+        .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+        .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+        .replace(/^---+$/gm,'<hr>').replace(/^━+$/gm,'<hr>')
+        .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g,'<em>$1</em>')
+        .replace(/`(.+?)`/g,'<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>')
+        .replace(/^- (.+)$/gm,'<li>$1</li>')
+        .replace(/\n\n/g,'</p><p>')
+        .replace(/\n/g,'<br>');
     }
-
-    async function unlock() {
-      const pwd = document.getElementById('pwd-input').value;
-      if (!pwd) return;
-
-      const encData = document.getElementById('encrypted-data').textContent.trim();
-      const decrypted = await decrypt(encData, pwd);
-
-      if (!decrypted) {
-        document.getElementById('error-msg').style.display = 'block';
-        document.getElementById('pwd-input').value = '';
-        document.getElementById('pwd-input').focus();
-        return;
-      }
-
-      // 解析内容
-      const data = JSON.parse(decrypted);
-      document.getElementById('report-title').textContent = data.title;
-      document.getElementById('report-meta').textContent = data.meta;
-      document.getElementById('report-body').innerHTML = renderMarkdown(data.body);
-
-      // 切换视图
-      document.getElementById('lock-screen').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
-
-      // 记住密码（sessionStorage，关标签页自动清除）
-      sessionStorage.setItem('rm-pwd', pwd);
-    }
-
-    function lockPage() {
-      sessionStorage.removeItem('rm-pwd');
-      document.getElementById('content').style.display = 'none';
-      document.getElementById('lock-screen').style.display = 'flex';
-      document.getElementById('pwd-input').value = '';
-      document.getElementById('error-msg').style.display = 'none';
-    }
-
-    // 回车键解锁
-    document.getElementById('pwd-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') unlock();
-    });
-
-    // 页面加载时检查 sessionStorage
-    window.addEventListener('DOMContentLoaded', async () => {
-      const savedPwd = sessionStorage.getItem('rm-pwd');
-      if (savedPwd) {
-        document.getElementById('pwd-input').value = savedPwd;
-        await unlock();
-      }
-    });
+    const data = JSON.parse(document.getElementById('report-data').textContent);
+    document.getElementById('title').textContent = data.title;
+    document.getElementById('meta').textContent = data.meta;
+    document.getElementById('body').innerHTML = '<p>'+renderMd(data.body)+'</p>';
   </script>
 </body>
 </html>
